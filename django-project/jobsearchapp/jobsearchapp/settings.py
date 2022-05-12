@@ -65,8 +65,8 @@ REST_FRAMEWORK = {
 }
 
 OAUTH2_INFO = {
-    "client_id": "sQnRAVrwNSiBp5xGJZz4FrwstR037seXDvfEBya2",
-    "client_secret": "zCechMTultxsTDfequjnxGWP8lBMG060rPVvon5vssVWhluXoK8VZkwYmbKz9KGdB3yd4QNgatDz2GN7ZavYAo5UdolYM3o7qjiIK8QaTn7NR7HvMDAhE9ykG5trHeKS"
+    "client_id": "KlllenN7aHNkFZMoOCk170210R4PTHUuwuHJIHPZ",
+    "client_secret": "gJUPpdyUEFJqEBWPmg5b9wQ1omouxXFHAaNVOC6np8jyNaFqQDWtlxhOkObfTLZ3Nkp6zgC7VIXWd8isjJZkqKaOu7SMke2Dagwf9asuN3AzqjrYgqe7m8mRVYHvYBlb"
 }
 
 OAUTH2_PROVIDER = {
@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'jobsearchapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'testdb',
+        'NAME': 'test1',
         'USER': 'root',
         'PASSWORD': 'huynh123',
         'HOST': ''  # mặc định localhost

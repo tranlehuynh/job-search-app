@@ -7,7 +7,10 @@ export const endpoints = {
     "lesson-detail": (lessonId) => `/lessons/${lessonId}/`,
     "users": "/users/",
     "updateUsers": (id) => `/users/${id}/`,
-    "deleteUsers": (id) => `/users/${id}`,
+    "deleteUsers": (id) => `/users/${id}/`,
+    "jobs": (id) => `/jobs/${id}/`,
+    "createJob": "/jobs/",
+    "createCompany": "/companies/"
 }
 
 export default axios.create({

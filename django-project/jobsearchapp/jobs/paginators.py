@@ -2,8 +2,8 @@ from rest_framework import pagination
 
 
 class JobPaginator(pagination.PageNumberPagination):
-    page_size = 4
+    page_size = 2
 
 
 class UserPaginator(pagination.PageNumberPagination):
-    page_size = 5
+    page_size = 10

@@ -1,19 +1,19 @@
 from django.contrib import admin
 from django.db.models import Count
 from django.template.response import TemplateResponse
-from .models import Category, Job, User, JobDetail, Tag, Comment, JobCategory, Company
+from .models import Category, Job, User, Comment, JobCategory, Company, CVOnline
 from django.utils.html import mark_safe
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.urls import path
 
 
-class JobDetailForm(forms.ModelForm):
-    content = forms.CharField(widget=CKEditorUploadingWidget)
-
-    class Meta:
-        model = JobDetail
-        fields = '__all__'
+# class JobDetailForm(forms.ModelForm):
+#     content = forms.CharField(widget=CKEditorUploadingWidget)
+#
+#     class Meta:
+#         model = JobDetail
+#         fields = '__all__'
 
 
 class JobAdmin(admin.ModelAdmin):
@@ -34,7 +34,7 @@ class JobAdmin(admin.ModelAdmin):
 
     def stats_view(self, request):
         c = Job.objects.filter(active=True).count()
-        stats = Job.objects.annotate(jobdetail_count=Count('my_jobdetail')).values('id', 'job_name', 'jobdetail_count')
+        stats = Job.objects.annotate(jobdetail_count=Count('my_job')).values('id', 'job_name', 'jobName_count')
 
         return TemplateResponse(request,
                                 'admin/job-stats.html', {
@@ -43,24 +43,14 @@ class JobAdmin(admin.ModelAdmin):
                                 })
 
 
-class JobDetailTagInlineAdmin(admin.TabularInline):
-    model = JobDetail.tags.through
-
-
-class JobDetailAdmin(admin.ModelAdmin):
-    form = JobDetailForm
-    inlines = [JobDetailTagInlineAdmin]
-
-
 class CategoryAdmin(admin.ModelAdmin):
     search_fields = ['name']
     list_filter = ['name', 'created_date']
     list_display = ['id', 'name', 'created_date']
 
 
-class TagAdmin(admin.ModelAdmin):
-    form = JobDetailForm
-    inlines = [JobDetailTagInlineAdmin]
+class CVAdmin(admin.ModelAdmin):
+    pass
 
 
 class JobCategoryAdmin(admin.ModelAdmin):
@@ -75,14 +65,11 @@ class CompanyAdmin(admin.ModelAdmin):
     list_display = ['id', 'company_name']
 
 
-
 # Register your models here.
 admin.site.register(User)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Job, JobAdmin)
-admin.site.register(JobDetail, JobDetailAdmin)
-admin.site.register(Tag)
 admin.site.register(Comment)
 admin.site.register(JobCategory, JobCategoryAdmin)
 admin.site.register(Company, CompanyAdmin)
-
+admin.site.register(CVOnline, CVAdmin)

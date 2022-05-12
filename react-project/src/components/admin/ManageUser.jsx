@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from "react-redux";
 import cookie from "react-cookies";
 import { logoutUser } from "../../ActionCreater";
 import Main from "./Main";
+import ErrorPage from "../ErrorPage";
 
 function AdminHome() {
   let path;
@@ -49,138 +50,149 @@ function AdminHome() {
     cookie.remove("user");
     myDispatch(logoutUser());
   };
-  return (
-    <>
-      <Row className="w-100 mt-3">
-        <Col
-          className="d-flex justify-content-center border border-top-0 border-bottom-0"
-          style={{ borderRadius: "10px" }}
-        >
-          <div>
-            <div className="d-flex align-items-center">
+
+  let userPath = <ErrorPage />;
+
+  if (user !== null && user !== undefined) {
+    if (user.role === 3) {
+      userPath = (
+        <>
+          <Row className="w-100 mt-3">
+            <Col
+              className="d-flex justify-content-center border border-top-0 border-bottom-0"
+              style={{ borderRadius: "10px" }}
+            >
               <div>
-                <img
-                  src={image}
-                  alt="a"
-                  style={{ width: "90px", height: "90px" }}
-                />
+                <div className="d-flex align-items-center">
+                  <div>
+                    <img
+                      src={image}
+                      alt="a"
+                      style={{ width: "90px", height: "90px" }}
+                    />
+                  </div>
+                  <div>
+                    <div>OU Job</div>
+                    <div>Welcome</div>
+                  </div>
+                </div>
+                <Link
+                  to="/admin/manage-user"
+                  style={{
+                    fontSize: "20px",
+                    fontWeight: "normal",
+                    cursor: "pointer",
+                  }}
+                  className="d-flex align-items-center mt-5 text-decoration-none text-muted"
+                >
+                  <FontAwesomeIcon
+                    icon={faTableColumns}
+                    style={{ marginRight: "5px" }}
+                  />
+                  Quản lý nhân viên
+                </Link>
+
+                <Link
+                  to="/"
+                  style={{ fontSize: "20px" }}
+                  className="d-flex align-items-center mt-4 text-decoration-none text-muted"
+                >
+                  <FontAwesomeIcon
+                    icon={faCircleInfo}
+                    style={{ marginRight: "5px" }}
+                  />
+                  Thống kê
+                </Link>
+                <Link
+                  to="/"
+                  onClick={logOut}
+                  style={{ fontSize: "20px" }}
+                  className="d-flex align-items-center mt-4 text-decoration-none text-muted"
+                >
+                  <FontAwesomeIcon
+                    icon={faGear}
+                    style={{ marginRight: "5px" }}
+                  />
+                  Đăng xuất
+                </Link>
               </div>
-              <div>
-                <div>OU Job</div>
-                <div>Welcome</div>
-              </div>
-            </div>
-            <Link
-              to="/admin/manage-user"
+            </Col>
+            <Col
+              xs={6}
+              className=""
               style={{
-                fontSize: "20px",
-                fontWeight: "normal",
-                cursor: "pointer",
+                backgroundColor: "rgba(250,250,250,255)",
+                borderRadius: "10px",
               }}
-              className="d-flex align-items-center mt-5 text-decoration-none text-muted"
             >
-              <FontAwesomeIcon
-                icon={faTableColumns}
-                style={{ marginRight: "5px" }}
-              />
-              Quản lý nhân viên
-            </Link>
+              <div>
+                <div>
+                  <Main />
+                </div>
+              </div>
+            </Col>
+            <Col
+              className="d-flex justify-content-center"
+              style={{ borderRadius: "10px" }}
+            >
+              <div>
+                {hiPath}
+                <div style={{ width: "18rem" }} className="text-center">
+                  {path}
+                </div>
 
-            <Link
-              to="/"
-              style={{ fontSize: "20px" }}
-              className="d-flex align-items-center mt-4 text-decoration-none text-muted"
-            >
-              <FontAwesomeIcon
-                icon={faCircleInfo}
-                style={{ marginRight: "5px" }}
-              />
-              Thống kê
-            </Link>
-            <Link
-              to="/"
-              onClick={logOut}
-              style={{ fontSize: "20px" }}
-              className="d-flex align-items-center mt-4 text-decoration-none text-muted"
-            >
-              <FontAwesomeIcon icon={faGear} style={{ marginRight: "5px" }} />
-              Đăng xuất
-            </Link>
-          </div>
-        </Col>
-        <Col
-          xs={6}
-          className=""
-          style={{
-            backgroundColor: "rgba(250,250,250,255)",
-            borderRadius: "10px",
-          }}
-        >
-          <div>
-            <div>
-              <Main />
-            </div>
-          </div>
-        </Col>
-        <Col
-          className="d-flex justify-content-center"
-          style={{ borderRadius: "10px" }}
-        >
-          <div>
-            {hiPath}
-            <div style={{ width: "18rem" }} className="text-center">
-              {path}
-            </div>
-
-            <div className="d-flex justify-content-between">
-              <Card
-                style={{
-                  width: "8.5rem",
-                  height: "9rem",
-                  backgroundColor: "rgba(254,243,240,255)",
-                }}
-                className="mt-4"
-              >
-                <Card.Body style={{ color: "#ad796d" }}>
-                  <Card.Title>Thống kê</Card.Title>
-                  <Card.Text className="d-flex">
-                    <div>
-                      <FontAwesomeIcon
-                        icon={faCircleInfo}
-                        style={{ marginRight: "5px" }}
-                      />
-                    </div>
-                    <div>Xem số liệu thống kê</div>
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-              <Card
-                style={{
-                  width: "8.5rem",
-                  height: "9rem",
-                  backgroundColor: "rgba(242,232,255,255)",
-                }}
-                className="mt-4"
-              >
-                <Card.Body style={{ color: "#9288c3" }}>
-                  <Card.Title>Quản lý</Card.Title>
-                  <Card.Text className="d-flex">
-                    <div>
-                      <FontAwesomeIcon
-                        icon={faTableColumns}
-                        style={{ marginRight: "5px" }}
-                      />
-                    </div>
-                    <div>Quản lý nhân viên</div>
-                  </Card.Text>
-                </Card.Body>
-              </Card>
-            </div>
-          </div>
-        </Col>
-      </Row>
-    </>
-  );
+                <div className="d-flex justify-content-between">
+                  <div
+                    style={{
+                      width: "8.5rem",
+                      height: "9rem",
+                      backgroundColor: "rgba(254,243,240,255)",
+                    }}
+                    className="mt-4"
+                  >
+                    <Card.Body style={{ color: "#ad796d" }}>
+                      <Card.Title>Thống kê</Card.Title>
+                      <Card.Text className="d-flex">
+                        <div>
+                          <FontAwesomeIcon
+                            icon={faCircleInfo}
+                            style={{ marginRight: "5px" }}
+                          />
+                        </div>
+                        <div>Xem số liệu thống kê</div>
+                      </Card.Text>
+                    </Card.Body>
+                  </div>
+                  <div
+                    style={{
+                      width: "8.5rem",
+                      height: "9rem",
+                      backgroundColor: "rgba(242,232,255,255)",
+                    }}
+                    className="mt-4"
+                  >
+                    <Card.Body style={{ color: "#9288c3" }}>
+                      <Card.Title>Quản lý</Card.Title>
+                      <Card.Text className="d-flex">
+                        <div>
+                          <FontAwesomeIcon
+                            icon={faTableColumns}
+                            style={{ marginRight: "5px" }}
+                          />
+                        </div>
+                        <div>Quản lý nhân viên</div>
+                      </Card.Text>
+                    </Card.Body>
+                  </div>
+                </div>
+              </div>
+            </Col>
+          </Row>
+        </>
+      );
+    }
+  }
+  return <>{userPath}</>;
 }
 
 export default AdminHome;

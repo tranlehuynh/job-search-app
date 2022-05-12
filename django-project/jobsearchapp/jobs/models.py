@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from ckeditor.fields import RichTextField
 
 
 class User(AbstractUser):
     avatar = models.ImageField(null=True, upload_to='users/%Y/%m')
     role = models.IntegerField(null=False, default=1)
+    # cv = models.FileField(null=True, upload_to='CV Templates/%Y/%m')
 
 
 class ModelBase(models.Model):
@@ -34,13 +34,6 @@ class JobCategory(models.Model):
         return self.name
 
 
-class CVOnline(ModelBase):
-    intro = RichTextField()
-    from_salary = models.DecimalField(default=0, decimal_places=2, max_digits=10)
-    to_salary = models.DecimalField(default=0, decimal_places=2, max_digits=10)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
-
-
 class Category(ModelBase):
     name = models.CharField(max_length=50, unique=True)
 
@@ -64,57 +57,29 @@ class Job(ModelBase):
         unique_together = ('job_name', 'category')
 
 
-class JobDetail(ModelBase):
-    job_name = models.CharField(max_length=255)
-    content = RichTextField()
-    image = models.ImageField(null=True, upload_to='jobdetails/%Y/%m')
-    job = models.ForeignKey(Job,
-                            related_name="jobdetails",
-                            related_query_name='my_jobdetail',
-                            on_delete=models.CASCADE)
-    tags = models.ManyToManyField('Tag')
-    viewers = models.ManyToManyField(User, through='UserJobDetailView')
-
-    def __str__(self):
-        return self.job_name
-
-
-class UserJobDetailView(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    jobdetail = models.ForeignKey(JobDetail, on_delete=models.CASCADE)
-    counter = models.IntegerField(default=0)
-    reading_date = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'jobdetail')
+class CVOnline(ModelBase):
+    cv = models.FileField(null=True, upload_to='CV Templates/%Y/%m')
+    user_id = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='cv')
 
 
 class Comment(ModelBase):
     content = models.TextField()
-    jobdetail = models.ForeignKey(JobDetail,
-                                  related_name='comments',
-                                  on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, related_name='comments',
+                            on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.content
 
 
-class Tag(ModelBase):
-    name = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name
-
-
-class ActionBase(ModelBase):
+class ActionBase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    jobdetail = models.ForeignKey(JobDetail, on_delete=models.CASCADE)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('user', 'jobdetail')
+        unique_together = ('user', 'job')
         abstract = True
 
 

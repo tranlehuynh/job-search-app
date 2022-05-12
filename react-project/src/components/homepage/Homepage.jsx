@@ -19,11 +19,13 @@ import logoPicture from "./../../assets/logo/logo-stadia.png";
 import informationPicture from "./../../assets/logo/google-icon.png";
 import homeTeamWorkPicture from "./../../assets/svg-images/home-teamworks.svg";
 import Footer from "../footer/Footer";
+import Api, { endpoints } from "../../api/Api";
 
 function Homepage() {
   const [jobs, setJobs] = useState([]);
   const [count, setCount] = useState(0);
   const [kw, setKw] = useState("");
+  const [test, myTest] = useState([]);
   const nav = useNavigate();
   const loginForm = useRef();
 
@@ -138,7 +140,9 @@ function Homepage() {
 
   const jobsAPI = (page = "?page=1") => {
     axios.get(`${APIJobs}${page}`).then((response) => {
-      setJobs(response.data.results);
+      const data = response.data.results.sort((a, b) => b.id - a.id);
+      setJobs(data);
+      myTest(data);
       setCount(response.data.count);
     });
   };
@@ -151,7 +155,7 @@ function Homepage() {
 
   //Pagination Count
   let countPage = [];
-  for (let i = 1; i <= Math.ceil(count / 6); i++) {
+  for (let i = 1; i <= Math.ceil(count / 10); i++) {
     countPage.push(
       // <Pagination.Item key={i}>
       //   <Link to={"/?page=" + (i + 1)}>{i + 1}</Link>
@@ -168,13 +172,36 @@ function Homepage() {
   function clickLoginForm() {
     loginForm.current.classList.toggle("form-login");
   }
-
   const search = (e) => {
     e.preventDefault();
 
     nav(`/?kw=${kw}`);
+
+    axios.get(`http://127.0.0.1:8000/jobs/?kw=${kw}`).then((response) => {
+      setJobs(response.data.results);
+      setCount(response.data.count);
+    });
   };
 
+  const resetData = () => {
+    setJobs(test);
+  };
+
+  const searchFulltime = async () => {
+    const res = jobs.filter((job) => job.id === 1);
+    console.log(res);
+    setJobs(res);
+  };
+
+  const searchParttime = async () => {
+    const res = await jobs.filter((job) => job.id === 2);
+    console.log(res);
+    setJobs(res);
+  };
+
+  const searchAll = () => {
+    setJobs(test);
+  };
   return (
     <div className="homepage">
       <nav className="navigation">
@@ -191,9 +218,6 @@ function Homepage() {
                   alt="logoPicture"
                 ></img>
               </a>
-            </li>
-            <li>
-              <Link to="/job-detail">Thông tin</Link>
             </li>
             <li>
               <a href="/#">Việc làm</a>
@@ -247,13 +271,20 @@ function Homepage() {
           <h2>Việc làm đang tuyển</h2>
           <ul>
             <li>
-              <a href="/#">Tất cả</a>
+              <div onClick={searchAll}>Tất cả</div>
             </li>
             <li>
-              <a href="/#">Bán thời gian</a>
+              <div
+                onClick={() => {
+                  jobsAPI(`${"?page="}${pageURL}`);
+                  searchParttime();
+                }}
+              >
+                Bán thời gian
+              </div>
             </li>
             <li>
-              <a href="/#">Toàn thời gian</a>
+              <div onClick={searchFulltime}>Toàn thời gian</div>
             </li>
           </ul>
         </div>
@@ -261,8 +292,15 @@ function Homepage() {
         <div className="jobs-many-many mt-3">
           <div className="jobs-detail">
             {jobs.map((job) => {
+              let jobId = job.id;
+              let url = `/job-detail/${jobId}`;
               return (
-                <div className="job-detail" key={job.id}>
+                <Link
+                  to={url}
+                  className="job-detail text-decoration-none"
+                  style={{ color: "black" }}
+                  key={job.id}
+                >
                   <div className="job-header">{job.job_name}</div>
                   <div className="job-main">{job.company.company_name}</div>
                   <div className="job-footer">
@@ -306,14 +344,12 @@ function Homepage() {
                       <div>9 triệu</div>
                     </div>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
           <div>
             <Pagination>
-              {/* <Link to={"/?page=1"}>{1}</Link>
-            <Link to={"/?page=2"}>{2}</Link> */}
               <div className="page-item">
                 <Link className="page-link" to={"/?page=1"}>
                   {1}

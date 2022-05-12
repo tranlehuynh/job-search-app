@@ -5,14 +5,12 @@ from django.http import Http404
 from rest_framework.views import APIView
 from django.conf import settings
 
-from .models import Category, Job, JobDetail, User, Comment, Like, Rating, Tag, Company, JobCategory
+from .models import Category, Job, User, Comment, Like, Rating, Company, JobCategory, CVOnline
 from .serializers import (
-    CategorySerializer, JobSerializer,
-    JobDetailSerializer, UserSerializer,
-    AuthWorkDetailSerializer, WorkDetailSerializer,
+    CategorySerializer, JobSerializer, UserSerializer,
     CommentSerializer, CreateCommentSerializer,
-    JobCategorySerializer, CompanySerializer
-    # ActionSerializer, RatingSerializer
+    JobCategorySerializer, CompanySerializer,
+    CVSerializer
 )
 from .paginators import JobPaginator, UserPaginator
 from drf_yasg.utils import swagger_auto_schema
@@ -47,7 +45,7 @@ class JobCategoryViewSet(viewsets.ViewSet, generics.ListAPIView):
         return q
 
 
-class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView):
+class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
     queryset = Company.objects.filter(active=True)
     serializer_class = CompanySerializer
 
@@ -61,10 +59,47 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView):
         return q
 
 
-class JobViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView, generics.UpdateAPIView):
+class CVViewSet(viewsets.ViewSet, generics.ListAPIView):
+    queryset = CVOnline.objects.filter(active=True)
+    serializer_class = CVSerializer
+
+
+class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIView, generics.ListAPIView, generics.DestroyAPIView):
     queryset = Job.objects.filter(active=True)
     serializer_class = JobSerializer
     pagination_class = JobPaginator
+
+    def get_permissions(self):
+        if self.action == 'add_comment':
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
+
+    def create(self, request):
+        category = Category.objects.get(pk=request.data.get('category_id'))
+        salary = request.data.get('salary')
+        image = request.data.get('image')
+        description = request.data.get('description')
+        category_job = JobCategory.objects.get(pk=request.data.get('job_category'))
+        company = Company.objects.get(pk=request.data.get('company'))
+        job_name = request.data.get('job_name')
+        job = Job.objects.create(company=company, job_name=job_name, job_category=category_job,
+                                 category=category, salary=salary, image=image, description=description)
+
+        return Response(data=JobSerializer(job, context={'request': request}).data, status=status.HTTP_201_CREATED)
+
+    def get_queryset(self):
+        job = self.queryset
+        category_id = self.request.query_params('category_id')
+        company_id = self.request.query_params('company_id')
+
+        if category_id:
+            job = job.filter(category_id=category_id)
+
+        if company_id:
+            job = job.filter(company_id=company_id)
+
+        return job
 
     def get_queryset(self):
         queryset = self.queryset
@@ -79,108 +114,18 @@ class JobViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView,
 
         return queryset
 
-    @swagger_auto_schema(
-        operation_description='Get the job details of a job',
-        responses={
-            status.HTTP_200_OK: JobDetailSerializer()
-        }
-    )
-    @action(methods=['get'], detail=True, url_path="jobdetails")
-    def get_jobdetails(self, request, pk):
-        job = self.get_object()
-        jobdetails = job.jobdetails.filter(active=True)
+    @action(methods=['post'], detail=True, url_path="add-comment")
+    def add_comment(self, request, pk):
+        content = request.data.get('content')
+        if content:
+            c = Comment.objects.create(content=content, job=self.get_object(), user=request.user)
 
-        kw = request.query_params.get('kw')
-        if kw:
-            jobdetails = jobdetails.filter(job_name__icontains=kw)
+            return Response(CommentSerializer(c).data, status=status.HTTP_201_CREATED)
 
-        return Response(data=JobDetailSerializer(jobdetails, many=True, context={'request': request}).data,
-                        status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class JobDetailViewSet(viewsets.ViewSet, generics.RetrieveAPIView):
-    queryset = JobDetail.objects.filter(active=True)
-    serializer_class = WorkDetailSerializer
-
-    def get_serializer_class(self):
-        if self.request.user.is_authenticated:
-            return AuthWorkDetailSerializer
-
-        return WorkDetailSerializer
-
-    def get_permissions(self):
-        if self.action in ['like', 'rate']:
-            return [permissions.IsAuthenticated()]
-
-        return [permissions.AllowAny()]
-
-    @action(methods=['post'], detail=True, url_path='tags')
-    def add_tag(self, request, pk):
-        try:
-            jobdetail = self.get_object()
-        except Http404:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            tags = request.data.get("tags")
-            if tags is not None:
-                for tag in tags:
-                    t, _ = Tag.objects.get_or_create(name=tag)
-                    jobdetail.tags.add(t)
-
-                jobdetail.save()
-
-                return Response(self.serializer_class(jobdetail).data,
-                                status=status.HTTP_201_CREATED)
-
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    @swagger_auto_schema(
-        operation_description='Get the comments of a job',
-        responses={
-            status.HTTP_200_OK: CommentSerializer()
-        }
-    )
-    @action(methods=['get'], url_path='comments', detail=True)
-    def get_comments(self, request, pk):
-        jobdetail = self.get_object()
-        comments = jobdetail.comments.select_related('user').filter(active=True)
-
-        return Response(CommentSerializer(comments, many=True).data,
-                        status=status.HTTP_200_OK)
-
-    @action(methods=['post'], detail=True, url_path='like')
-    def like(self, request, pk):
-        jobdetail = self.get_object()
-        user = request.user
-
-        l, _ = Like.objects.get_or_create(jobdetail=jobdetail, user=user)
-        l.active = not l.active
-        try:
-            l.save()
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(data=AuthWorkDetailSerializer(jobdetail, context={'request': request}).data,
-                        status=status.HTTP_200_OK)
-
-    @action(methods=['post'], detail=True, url_path='rating')
-    def rating(self, request, pk):
-        jobdetail = self.get_object()
-        user = request.user
-
-        r, _ = Rating.objects.get_or_create(jobdetail=jobdetail, user=user)
-        r.rate = request.data.get('rate', 0)
-        try:
-            r.save()
-        except:
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return Response(data=AuthWorkDetailSerializer(jobdetail, context={'request': request}).data,
-                        status=status.HTTP_200_OK)
-
-
-class CommentViewSet(viewsets.ViewSet, generics.CreateAPIView,
-                     generics.UpdateAPIView, generics.DestroyAPIView, generics.ListAPIView):
+class CommentViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.DestroyAPIView):
     queryset = Comment.objects.filter(active=True)
     serializer_class = CreateCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -191,11 +136,34 @@ class CommentViewSet(viewsets.ViewSet, generics.CreateAPIView,
 
         return [permissions.IsAuthenticated()]
 
+    def destroy(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super().destroy(request, *args, **kwargs)
 
-class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView, generics.UpdateAPIView):
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+    def partial_update(self, request, *args, **kwargs):
+        if request.user == self.get_object().user:
+            return super().partial_update(request, *args, **kwargs)
+
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView,
+                  generics.UpdateAPIView, generics.DestroyAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     pagination_class = UserPaginator
+
+    @action(methods=['post'], detail=True, url_name='cv', url_path='cv')
+    def add_cv(self, request, pk):
+        cv_path = request.data.get('cv')
+        if cv_path:
+            cv = CVOnline.objects.create(cv=cv_path, user_id=self.get_object())
+
+            return Response(data=CVSerializer(cv, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def get_permissions(self):
         if self.action == 'current_user':
@@ -211,11 +179,6 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView
 
 class MyJobView(generics.ListCreateAPIView):
     lookup_field = ['job_name']
-    queryset = Job.objects.filter(active=True)
-    serializer_class = JobSerializer
-
-
-class MyJobDetailView(generics.RetrieveAPIView):
     queryset = Job.objects.filter(active=True)
     serializer_class = JobSerializer
 

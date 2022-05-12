@@ -133,7 +133,7 @@ function AdminHome() {
             </div>
 
             <div className="d-flex justify-content-between">
-              <Card
+              <div
                 style={{
                   width: "8.5rem",
                   height: "9rem",
@@ -153,8 +153,8 @@ function AdminHome() {
                     <div>Xem số liệu thống kê</div>
                   </Card.Text>
                 </Card.Body>
-              </Card>
-              <Card
+              </div>
+              <div
                 style={{
                   width: "8.5rem",
                   height: "9rem",
@@ -174,7 +174,7 @@ function AdminHome() {
                     <div>Quản lý nhân viên</div>
                   </Card.Text>
                 </Card.Body>
-              </Card>
+              </div>
             </div>
           </div>
         </Col>

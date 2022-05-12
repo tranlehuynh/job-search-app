@@ -1,10 +1,13 @@
 import { Pagination } from "react-bootstrap";
+import { Link } from "react-router-dom";
 function MyPagination() {
   return (
     <>
       <Pagination>
         <div className="page-item">
-          <div className="page-link">1</div>
+          <Link to="?page=1" className="page-link">
+            1
+          </Link>
         </div>
       </Pagination>
     </>

@@ -1,8 +1,8 @@
-import { useState } from "react";
-import { Button, Table, Modal, Form } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Button, Table, Modal, Form, Pagination } from "react-bootstrap";
 import Api, { endpoints } from "../../api/Api";
-import MyPagination from "./Pagination";
-// import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 function Main() {
   const [updateShow, setUpdateShow] = useState(false);
@@ -14,35 +14,32 @@ function Main() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
-  //   const [q] = useSearchParams();
+  const [q] = useSearchParams();
+
+  const [mypage, setMyPage] = useState([]);
 
   const handleUpdateShow = () => setUpdateShow(true);
   const handleUpdateClose = () => setUpdateShow(false);
   const handleDeleteShow = () => setDeleteShow(true);
   const handleDeleteClose = () => setDeleteShow(false);
 
-  // useEffect(() => {
-  //   const loadUser = async () => {
-  //     //   let query = "";
-  //     //   let page = q.get("page");
-  //     //     if (page != null) {
-  //     //         query += `page?`
-  //     //     }
-  //     let response = await Api.get(endpoints["users"]);
-  //     setUser(response.data.results);
-  //   };
-  //   loadUser();
-  // }, []);
+  let pageURL = q.get("page");
+
+  useEffect(() => {
+    const loadData = async (page = "?page=1") => {
+      const res = await Api.get(endpoints["users"] + `${page}`);
+      console.log(res.data.results);
+      setUser(res.data.results);
+    };
+
+    if (pageURL !== null) {
+      loadData(`${"?page="}${pageURL}`);
+    }
+  }, [pageURL]);
 
   const loadUser = async () => {
-    //   let query = "";
-    //   let page = q.get("page");
-    //     if (page != null) {
-    //         query += `page?`
-    //     }
     let response = await Api.get(endpoints["users"]);
     setUser(response.data.results);
-    console.log(user);
   };
 
   const loadEmployerRegister = async () => {
@@ -50,7 +47,6 @@ function Main() {
     let EmployerUser = await response.data.results.filter(
       (user) => user.role === 4
     );
-    console.log(EmployerUser);
     setUser(EmployerUser);
   };
 
@@ -64,8 +60,13 @@ function Main() {
     handleUpdateShow();
   };
 
+  const showUser2 = (id) => {
+    setId(id);
+    handleDeleteShow();
+  };
+
   const updateUser = async (id) => {
-    let response = await Api.patch(endpoints["updateUsers"](id), {
+    await Api.patch(endpoints["updateUsers"](id), {
       first_name: firstName,
       last_name: lastName,
       username: username,
@@ -73,7 +74,11 @@ function Main() {
       role: role,
     });
     handleUpdateClose();
-    console.log(response.data);
+  };
+
+  const deleteUser = async (id) => {
+    await Api.delete(endpoints["deleteUsers"](id));
+    handleDeleteClose();
   };
 
   return (
@@ -114,9 +119,7 @@ function Main() {
             <Form.Group className="mb-3" controlId="formBasicRole1">
               <Form.Label>Chức vụ </Form.Label>
               <Form.Select onChange={(e) => setRole(e.target.value)}>
-                <option disabled value="">
-                  Chọn chức vụ...
-                </option>
+                <option value="">Chọn chức vụ...</option>
                 <option value="1">Người dùng</option>
                 <option value="2">Nhà tuyển dụng</option>
                 <option value="3">Admin</option>
@@ -141,6 +144,8 @@ function Main() {
             variant="primary"
             onClick={() => {
               updateUser(id);
+              loadEmployerRegister();
+              loadUser();
             }}
           >
             Lưu thay đổi
@@ -156,7 +161,14 @@ function Main() {
           <Button variant="secondary" onClick={handleDeleteClose}>
             Đóng
           </Button>
-          <Button variant="danger" onClick={handleDeleteClose}>
+          <Button
+            variant="danger"
+            onClick={() => {
+              deleteUser(id);
+              loadEmployerRegister();
+              loadUser();
+            }}
+          >
             Xóa
           </Button>
         </Modal.Footer>
@@ -176,7 +188,14 @@ function Main() {
           className="float-end mt-5 mb-4"
           style={{ marginRight: "8px" }}
         >
-          Ứng tuyển nhà tuyển dụng
+          Đăng ký nhà tuyển dụng
+        </Button>
+        <Button
+          variant="success"
+          className="float-end mt-5 mb-4"
+          style={{ marginRight: "8px" }}
+        >
+          Đăng ký công ty
         </Button>
         <Table striped bordered hover size="sm" className="text-center">
           <thead>
@@ -226,7 +245,9 @@ function Main() {
                     <Button
                       variant="danger"
                       style={{ marginLeft: "5px" }}
-                      onClick={handleDeleteShow}
+                      onClick={() => {
+                        showUser2(u.id);
+                      }}
                     >
                       Xóa
                     </Button>
@@ -236,7 +257,13 @@ function Main() {
             })}
           </tbody>
         </Table>
-        <MyPagination />
+        <Pagination>
+          <div className="page-item">
+            <Link to="/admin/manage-user/?page=1" className="page-link">
+              1
+            </Link>
+          </div>
+        </Pagination>
       </div>
     </>
   );

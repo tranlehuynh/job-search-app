@@ -1,4 +1,4 @@
-const JobDetailMain = () => {
+const JobDetailMain = (props) => {
   return (
     <>
       <div className="w-100 d-flex justify-content-center mt-3">
@@ -9,14 +9,29 @@ const JobDetailMain = () => {
               className="border rounded p-3 "
             >
               <h3>Thông tin chi tiết</h3>
-              <div>Ngành nghề: Công nghệ thông tin</div>
-              <div>Mức lương: 10000VND</div>
-              <div>Địa điểm: 10000VND</div>
               <div>
-                Ghi chú về công việc: Lorem ipsum dolor sit amet consectetur
-                adipisicing elit. Deleniti dolores corporis dolorem facere
-                consequuntur autem non molestias harum quia. Unde nulla
-                voluptatem sit? Repudiandae iste iusto veritatis ullam velit ad?
+                <span style={{ fontWeight: "bold", fontSize: "17px" }}>
+                  Thể loại:
+                </span>{" "}
+                {props.category}
+              </div>
+              <div>
+                <span style={{ fontWeight: "bold", fontSize: "17px" }}>
+                  Mức lương:
+                </span>{" "}
+                {props.salary}
+              </div>
+              <div>
+                <span style={{ fontWeight: "bold", fontSize: "17px" }}>
+                  Địa điểm:
+                </span>{" "}
+                An Giang
+              </div>
+              <div>
+                <span style={{ fontWeight: "bold", fontSize: "17px" }}>
+                  Ghi chú về công việc:
+                </span>{" "}
+                {props.descriptions}
               </div>
             </div>
           </div>

@@ -8,7 +8,7 @@ function Home() {
 
   const user = useSelector((state) => state.user.user);
   if (user !== null && user !== undefined) {
-    if (user.role === 5) {
+    if (user.role === 2) {
       path = <Employer />;
     }
     if (user.role === 3) {
