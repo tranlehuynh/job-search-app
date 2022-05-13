@@ -65,13 +65,13 @@ REST_FRAMEWORK = {
 }
 
 OAUTH2_INFO = {
-    "client_id": "KlllenN7aHNkFZMoOCk170210R4PTHUuwuHJIHPZ",
-    "client_secret": "gJUPpdyUEFJqEBWPmg5b9wQ1omouxXFHAaNVOC6np8jyNaFqQDWtlxhOkObfTLZ3Nkp6zgC7VIXWd8isjJZkqKaOu7SMke2Dagwf9asuN3AzqjrYgqe7m8mRVYHvYBlb"
+    "client_id": "DkdIA3qKS6WRdra9ogyKeYeTN8zUdxlZDC6RpaN0",
+    "client_secret": "JME3QNtmF7FaHhL5fP68natkrnsONaJ1xl7yLZhPu7a1RVLDrovzud530CQxqs6UphWUBU9gIKrgKrHayODkZBWnfXQXsgnskU7p01B5kP4Y744VkMGEza9Kb0rBXHNq"
 }
 
-OAUTH2_PROVIDER = {
-    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
-}
+# OAUTH2_PROVIDER = {
+#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+# }
 
 CKEDITOR_UPLOAD_PATH = 'images/jobdetails'
 
@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'jobsearchapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'test1',
+        'NAME': 'jobdb',
         'USER': 'root',
         'PASSWORD': 'huynh123',
         'HOST': ''  # mặc định localhost

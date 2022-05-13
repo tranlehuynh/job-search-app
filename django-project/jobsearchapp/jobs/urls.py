@@ -18,6 +18,5 @@ router.register(prefix='cv', viewset=views.CVViewSet, basename='cv')
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('my-jobs/', views.MyJobView.as_view()),
     path('oauth2/', views.Oauth2.as_view()),
 ]

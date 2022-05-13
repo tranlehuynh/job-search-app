@@ -158,7 +158,7 @@ function Homepage() {
 
   //Pagination Count
   let countPage = [];
-  for (let i = 1; i <= Math.ceil(count / 2); i++) {
+  for (let i = 1; i <= Math.ceil(count / 8); i++) {
     <div className="page-item" key={i}>
       <Link className="page-link" to={"/?page=" + (i + 1)}>
         {i + 1}
@@ -211,15 +211,15 @@ function Homepage() {
     setJobs(test);
   };
 
-  const handleClick = (data) => {
-    console.log(data.selected);
-    <Link to={`${"?page="}${data.selected + 1}`}></Link>;
-    jobsAPI(`${"?page="}${data.selected + 1}`);
-  };
+  // const handleClick = (data) => {
+  //   console.log(data.selected);
+  //   <Link to={`${"?page="}${data.selected + 1}`}></Link>;
+  //   jobsAPI(`${"?page="}${data.selected + 1}`);
+  // };
 
-  const myF = (e) => {
-    e.preventDefault();
-  };
+  // const myF = (e) => {
+  //   e.preventDefault();
+  // };
   return (
     <div className="homepage">
       <nav className="navigation">
@@ -365,7 +365,7 @@ function Homepage() {
             })}
           </div>
           <div>
-            <ReactPaginate
+            {/* <ReactPaginate
               breakLabel={"..."}
               pageCount={25}
               previousLabel={"<"}
@@ -383,19 +383,20 @@ function Homepage() {
               disableInitialCallback={true}
               initialPage={1}
               activeClassName="page-item active"
+              href
               hrefBuilder={(currentPage) => {
                 <div href={currentPage}>{currentPage}</div>;
               }}
-            />
-            {/* <Pagination>
-              <Pagination.First />
-              <Pagination.Prev />
+            /> */}
+            <Pagination>
+              {/* <Pagination.First />
+              <Pagination.Prev /> */}
               <div className="page-item">
                 <Link className="page-link" to={"/?page=1"}>
                   {1}
                 </Link>
               </div>
-              <div className="page-item">
+              {/* <div className="page-item">
                 <Link className="page-link" to={"/?page=2"}>
                   {2}
                 </Link>
@@ -414,12 +415,12 @@ function Homepage() {
                 <Link className="page-link" to={"/?page=5"}>
                   {5}
                 </Link>
-              </div>
-              <Pagination.Next />
-              <Pagination.Last />
+              </div> */}
+              {/* <Pagination.Next />
+              <Pagination.Last /> */}
 
-              {{countPage}}
-            </Pagination> */}
+              {countPage}
+            </Pagination>
           </div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import Comment from "./comment/Comment";
 
 const JobDetailMain = (props) => {
+  console.log("Hi");
   return (
     <>
       <div className="w-100 d-flex justify-content-center mt-3 mb-4">

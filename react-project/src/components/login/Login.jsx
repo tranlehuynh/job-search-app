@@ -213,7 +213,7 @@ function Login() {
               />
               <label htmlFor="login-passwork">Mật khẩu</label>
               <input
-                type="text"
+                type="password"
                 name="login-passwork"
                 id="login-passswork"
                 autoComplete="off"

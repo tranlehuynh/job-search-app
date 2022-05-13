@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Job, User, Company, JobCategory, Comment, CVOnline
+from .models import Category, Job, User, Company, JobCategory, Comment, CVOnline, Action, Rating, CompanyView
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -142,13 +142,20 @@ class CommentSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ['id', 'content', 'created_date', 'updated_date']
 
-# class ActionSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Action
-#         fields = ['id', 'type', 'created_date']
+
+class ActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Action
+        fields = ['id', 'type', 'created_date']
 
 
-# class RatingSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Rating
-#         fields = ['id', 'rate', 'created_date']
+class RatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = ['id', 'rate', 'created_date']
+
+
+class CompanyViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyView
+        fields = ['id', 'views', 'company']

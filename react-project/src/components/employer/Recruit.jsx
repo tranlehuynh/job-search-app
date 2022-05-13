@@ -16,6 +16,8 @@ const Recruit = () => {
   const [description, setDescription] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const user = useSelector((state) => state.user.user);
+  // let jobImage = useRef();
+  // const [temp, setTemp] = useState("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -26,7 +28,10 @@ const Recruit = () => {
     const loadAddress = async () => {
       const data = await Api.get(endpoints["createCompany"]);
       const res = data.data.filter((s) => s.user === user.id);
+      console.log(res);
       setCompany(res);
+
+      console.log(data);
 
       console.log(data.data);
     };
@@ -39,6 +44,15 @@ const Recruit = () => {
   };
 
   let path = <ErrorPage />;
+
+  // let formData = new FormData()
+  //   formData.append("job_name", jobName);
+  //     formData.append("job_category", jobCate);
+  //     formData.append("company", company[0].id);
+  //     formData.append("salary", salary);
+  //     formData.append("category_id", selectedValue);
+  //     formData.append("description", description);
+  //     formData.append("image")
 
   const createJob = async (e) => {
     e.preventDefault();
@@ -103,7 +117,7 @@ const Recruit = () => {
               >
                 <option value="">Chọn ngành...</option>;
                 <option value="1">Fulltime</option>;
-                <option value="2">Partime</option>;
+                <option value="2">Parttime</option>;
               </Form.Select>
             </Form.Group>
             {/* <Form.Group className="mb-3 mt-3">
@@ -129,6 +143,14 @@ const Recruit = () => {
                 placeholder="Nhập thông tin về việc làm, công ty, phúc lợi..."
               />
             </Form.Group>
+            {/* <label htmlFor="login-avatar-1">Avatar</label>
+            <input
+              type="file"
+              ref={jobImage}
+              onChange={(e) => setTemp(e.target.value)}
+              id="login-avatar-1"
+              name="login-avatar-1"
+            /> */}
             <div className="text-center">
               <Button variant="primary" type="submit">
                 Đăng tin

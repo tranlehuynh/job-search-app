@@ -42,19 +42,25 @@ class Category(ModelBase):
 
 
 class Job(ModelBase):
-    job_name = models.CharField(max_length=255, null=False)
+    job_name = models.CharField(max_length=255, null=False, )
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to='jobs/%Y/%m')
     salary = models.CharField(max_length=255, null=True)
     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
     company = models.ForeignKey(Company, null=True, on_delete=models.CASCADE)
     job_category = models.ForeignKey(JobCategory, on_delete=models.CASCADE, null=True)
+    # users = models.ManyToManyField(User, through='UserApply', related_name='jobs')
 
     def __str__(self):
         return self.job_name
 
     # class Meta:
     #     unique_together = ('job_name', 'category')
+
+
+# class UserApply(ModelBase):
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='jobs_applied')
+#     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobs_applied')
 
 
 class CVOnline(ModelBase):
@@ -75,28 +81,33 @@ class Comment(ModelBase):
 
 class ActionBase(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('user', 'job')
         abstract = True
 
 
-class Like(ActionBase):
-    active = models.BooleanField(default=False)
+# class Like(ActionBase):
+#     active = models.BooleanField(default=False)
 
-
-# class Action(ActionBase):
-# LIKE, HEART, DISLIKE = range(3)
-# ACTIONS = [
-#     (LIKE, '👍'),
-#     (HEART, '❤'),
-#     (DISLIKE, '👎')
-# ]
-# type = models.PositiveSmallIntegerField(choices=ACTIONS, default=LIKE)
+class Action(ActionBase):
+    LIKE, HEART, DISLIKE = range(3)
+    ACTIONS = [
+        (LIKE, '👍'),
+        (HEART, '❤'),
+        (DISLIKE, '👎')
+    ]
+    type = models.PositiveSmallIntegerField(choices=ACTIONS, default=LIKE)
 
 
 class Rating(ActionBase):
     rate = models.PositiveSmallIntegerField(default=0)
+
+
+class CompanyView(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    views = models.IntegerField(default=0)
+    company = models.OneToOneField(Company, on_delete=models.CASCADE)

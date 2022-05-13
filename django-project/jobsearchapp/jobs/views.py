@@ -5,16 +5,18 @@ from django.http import Http404
 from rest_framework.views import APIView
 from django.conf import settings
 
-from .models import Category, Job, User, Comment, Like, Rating, Company, JobCategory, CVOnline
+from .models import Category, Job, User, Comment, Rating, Company, JobCategory, CVOnline, Action, CompanyView
 from .serializers import (
     CategorySerializer, JobSerializer, UserSerializer,
     CommentSerializer, CreateCommentSerializer,
     JobCategorySerializer, CompanySerializer,
-    CVSerializer
+    CVSerializer, RatingSerializer,
+    ActionSerializer, CompanyViewSerializer
 )
 from .paginators import JobPaginator, UserPaginator
 from drf_yasg.utils import swagger_auto_schema
 from .perms import CommentOwnerPerms
+from django.db.models import F
 
 
 class CategoryViewset(viewsets.ViewSet, generics.ListAPIView):
@@ -49,6 +51,12 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIV
     queryset = Company.objects.filter(active=True)
     serializer_class = CompanySerializer
 
+    def get_permissions(self):
+        if self.action in ['take_action', 'rate']:
+            return [permissions.IsAuthenticated()]
+
+        return [permissions.AllowAny()]
+
     def get_queryset(self):
         q = self.queryset
 
@@ -58,13 +66,48 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIV
 
         return q
 
+    @action(methods=['post'], detail=True, url_path='like')
+    def take_action(self, request, pk):
+        try:
+            action_type = int(request.data['type'])
+        except IndexError | ValueError as ex:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            action = Action.objects.create(type=action_type,
+                                           user=request.user, company=self.get_object())
+
+            return Response(ActionSerializer(action).data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='rating')
+    def rate(self, request, pk):
+        try:
+            rating = int(request.data['rating'])
+        except IndexError | ValueError as ex:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            r = Rating.objects.create(rate=rating,
+                                      user=request.user, company=self.get_object())
+
+            return Response(RatingSerializer(r).data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path='views')
+    def count_view(self, request, pk):
+        v, created = CompanyView.objects.get_or_create(company=self.get_object())
+        v.views = F('views') + 1
+        v.save()
+
+        v.refresh_from_db()
+
+        return Response(CompanyViewSerializer(v).data, status=status.HTTP_200_OK)
+
 
 class CVViewSet(viewsets.ViewSet, generics.ListAPIView, generics.UpdateAPIView):
     queryset = CVOnline.objects.filter(active=True)
     serializer_class = CVSerializer
 
 
-class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIView, generics.ListAPIView, generics.DestroyAPIView):
+class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIView,
+                 generics.ListAPIView, generics.DestroyAPIView):
     queryset = Job.objects.filter(active=True)
     serializer_class = JobSerializer
     pagination_class = JobPaginator
@@ -76,7 +119,7 @@ class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIV
         return [permissions.AllowAny()]
 
     def create(self, request):
-        category = Category.objects.get(pk=request.data.get('category_id'))
+        category = Category.objects.get(pk=int(request.data.get('category_id')))
         salary = request.data.get('salary')
         image = request.data.get('image')
         description = request.data.get('description')
@@ -86,7 +129,7 @@ class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIV
         job = Job.objects.create(company=company, job_name=job_name, job_category=category_job,
                                  category=category, salary=salary, image=image, description=description)
 
-        return Response(data=JobSerializer(job, context={'request': request}).data, status=status.HTTP_201_CREATED)
+        return Response(data=JobSerializer(job, context={"request": request}).data, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         job = self.queryset
@@ -125,7 +168,7 @@ class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIV
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class CommentViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.DestroyAPIView):
+class CommentViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.DestroyAPIView, generics.ListAPIView):
     queryset = Comment.objects.filter(active=True)
     serializer_class = CreateCommentSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -150,7 +193,7 @@ class CommentViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.DestroyA
 
 
 class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView, generics.RetrieveAPIView,
-                  generics.UpdateAPIView, generics.DestroyAPIView):
+                  generics.UpdateAPIView):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     pagination_class = UserPaginator
@@ -187,12 +230,6 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView
     def current_user(self, request):
         return Response(self.serializer_class(request.user, context={'request': request}).data,
                         status=status.HTTP_200_OK)
-
-
-class MyJobView(generics.ListCreateAPIView):
-    lookup_field = ['job_name']
-    queryset = Job.objects.filter(active=True)
-    serializer_class = JobSerializer
 
 
 class Oauth2(APIView):
