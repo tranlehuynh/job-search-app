@@ -19,7 +19,7 @@ import logoPicture from "./../../assets/logo/logo-stadia.png";
 import informationPicture from "./../../assets/logo/google-icon.png";
 import homeTeamWorkPicture from "./../../assets/svg-images/home-teamworks.svg";
 import Footer from "../footer/Footer";
-import Api, { endpoints } from "../../api/Api";
+import ReactPaginate from "react-paginate";
 
 function Homepage() {
   const [jobs, setJobs] = useState([]);
@@ -130,6 +130,9 @@ function Homepage() {
     path = (
       <>
         <li>
+          <Link to="/employer-register">Nhà tuyển dụng</Link>
+        </li>
+        <li>
           <Link to="/" onClick={logOut}>
             Đăng xuất
           </Link>
@@ -155,7 +158,12 @@ function Homepage() {
 
   //Pagination Count
   let countPage = [];
-  for (let i = 1; i <= Math.ceil(count / 10); i++) {
+  for (let i = 1; i <= Math.ceil(count / 2); i++) {
+    <div className="page-item" key={i}>
+      <Link className="page-link" to={"/?page=" + (i + 1)}>
+        {i + 1}
+      </Link>
+    </div>;
     countPage.push(
       // <Pagination.Item key={i}>
       //   <Link to={"/?page=" + (i + 1)}>{i + 1}</Link>
@@ -183,9 +191,9 @@ function Homepage() {
     });
   };
 
-  const resetData = () => {
-    setJobs(test);
-  };
+  // const resetData = () => {
+  //   setJobs(test);
+  // };
 
   const searchFulltime = async () => {
     const res = jobs.filter((job) => job.id === 1);
@@ -201,6 +209,16 @@ function Homepage() {
 
   const searchAll = () => {
     setJobs(test);
+  };
+
+  const handleClick = (data) => {
+    console.log(data.selected);
+    <Link to={`${"?page="}${data.selected + 1}`}></Link>;
+    jobsAPI(`${"?page="}${data.selected + 1}`);
+  };
+
+  const myF = (e) => {
+    e.preventDefault();
   };
   return (
     <div className="homepage">
@@ -225,9 +243,7 @@ function Homepage() {
             <li>
               <a href="/#">Về chúng tôi</a>
             </li>
-            <li>
-              <Link to="/employer-register">Nhà tuyển dụng</Link>
-            </li>
+
             {path}
           </ul>
         </div>
@@ -324,7 +340,7 @@ function Homepage() {
                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
-                      <div>{job.company.address}</div>
+                      <div>{job.job_category.name}</div>
                     </div>
                     <div className="job-footer-section">
                       <svg
@@ -349,14 +365,61 @@ function Homepage() {
             })}
           </div>
           <div>
-            <Pagination>
+            <ReactPaginate
+              breakLabel={"..."}
+              pageCount={25}
+              previousLabel={"<"}
+              nextLabel={">"}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={3}
+              onPageChange={handleClick}
+              containerClassName="pagination"
+              pageClassName="page-item"
+              pageLinkClassName="page-link"
+              page
+              previousClassName="page-link"
+              nextLinkClassName="page-link"
+              breakLinkClassName="page-link"
+              disableInitialCallback={true}
+              initialPage={1}
+              activeClassName="page-item active"
+              hrefBuilder={(currentPage) => {
+                <div href={currentPage}>{currentPage}</div>;
+              }}
+            />
+            {/* <Pagination>
+              <Pagination.First />
+              <Pagination.Prev />
               <div className="page-item">
                 <Link className="page-link" to={"/?page=1"}>
                   {1}
                 </Link>
               </div>
-              {countPage}
-            </Pagination>
+              <div className="page-item">
+                <Link className="page-link" to={"/?page=2"}>
+                  {2}
+                </Link>
+              </div>
+              <div className="page-item">
+                <Link className="page-link" to={"/?page=3"}>
+                  {3}
+                </Link>
+              </div>
+              <div className="page-item">
+                <Link className="page-link" to={"/?page=4"}>
+                  {4}
+                </Link>
+              </div>
+              <div className="page-item">
+                <Link className="page-link" to={"/?page=5"}>
+                  {5}
+                </Link>
+              </div>
+              <Pagination.Next />
+              <Pagination.Last />
+
+              {{countPage}}
+            </Pagination> */}
           </div>
         </div>
       </div>

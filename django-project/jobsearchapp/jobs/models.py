@@ -53,13 +53,14 @@ class Job(ModelBase):
     def __str__(self):
         return self.job_name
 
-    class Meta:
-        unique_together = ('job_name', 'category')
+    # class Meta:
+    #     unique_together = ('job_name', 'category')
 
 
 class CVOnline(ModelBase):
     cv = models.FileField(null=True, upload_to='CV Templates/%Y/%m')
     user_id = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='cv')
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, related_name='CVOnlines')
 
 
 class Comment(ModelBase):

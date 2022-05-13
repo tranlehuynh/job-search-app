@@ -45,9 +45,9 @@ const Recruit = () => {
     const res = await Api.post(endpoints["createJob"], {
       job_name: jobName,
       job_category: jobCate,
-      company: company.company_name,
+      company: company[0].id,
       salary: salary,
-      category: selectedValue,
+      category_id: selectedValue,
       description: description,
     });
     console.log(res.data);

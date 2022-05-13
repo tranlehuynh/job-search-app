@@ -59,7 +59,7 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIV
         return q
 
 
-class CVViewSet(viewsets.ViewSet, generics.ListAPIView):
+class CVViewSet(viewsets.ViewSet, generics.ListAPIView, generics.UpdateAPIView):
     queryset = CVOnline.objects.filter(active=True)
     serializer_class = CVSerializer
 
@@ -162,6 +162,18 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView
             cv = CVOnline.objects.create(cv=cv_path, user_id=self.get_object())
 
             return Response(data=CVSerializer(cv, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    @add_cv.mapping.patch
+    def patch_cv(self, request, pk):
+        cv_path = request.data.get('cv')
+        cv_update = CVOnline.objects.filter(user_id=self.get_object()).first()
+        if cv_path and cv_update:
+            cv_update.cv = cv_path
+            cv_update.save()
+
+            return Response(CVSerializer(cv_update, context={'request': request}).data, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 

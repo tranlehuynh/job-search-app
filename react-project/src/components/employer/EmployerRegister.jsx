@@ -6,6 +6,8 @@ import Api, { endpoints } from "../../api/Api";
 function EmployerRegister() {
   const [companyName, setCompanyName] = useState("");
   const [address, setAddress] = useState("");
+  const [test, setTest] = useState(true);
+
   const user = useSelector((state) => state.user.user);
 
   const updateUser = async (id) => {
@@ -14,8 +16,9 @@ function EmployerRegister() {
       role: "4",
     });
 
-    user.id = 4;
-    console.log(user.id);
+    user.role = 4;
+    setTest(false);
+    console.log(user.role);
     console.log(res.data);
   };
 
@@ -23,10 +26,14 @@ function EmployerRegister() {
     e.preventDefault();
     const res = await Api.post(endpoints["createCompany"], {
       company_name: companyName,
-      active: false,
+      active: true,
       address: address,
       user: user.id,
     });
+
+    setTest(false);
+
+    user.role = 4;
     console.log(res.data);
   };
 
@@ -44,15 +51,16 @@ function EmployerRegister() {
   );
 
   if (companyName !== "" && address !== "") {
-    if (user.id !== 4) {
+    if (user.role === 4 || test === false) {
       path = (
         <>
           <Button
             variant="primary"
             type="submit"
+            disabled
             onClick={() => updateUser(user.id)}
           >
-            Đăng ký
+            Đã đăng ký đợi admin chấp nhận
           </Button>
         </>
       );
@@ -61,7 +69,6 @@ function EmployerRegister() {
         <>
           <Button
             variant="primary"
-            disabled
             type="submit"
             onClick={() => updateUser(user.id)}
           >

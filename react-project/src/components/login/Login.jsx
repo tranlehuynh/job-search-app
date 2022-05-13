@@ -14,43 +14,47 @@ import informationPicture from "./../../assets/logo/google-icon.png";
 import logo from "./../../assets/logo/logo-stadia.png";
 
 import FirebaseInit from "../../firebase/FirebaseInit";
-import {
-  getAuth,
-  signInWithPopup,
-  GoogleAuthProvider,
-  onAuthStateChanged,
-  signOut,
-} from "firebase/auth";
+// import {
+//   // getAuth,
+//   // signInWithPopup,
+//   GoogleAuthProvider,
+//   // onAuthStateChanged,
+//   // signOut,
+// } from "firebase/auth";
+import { Button, Modal } from "react-bootstrap";
 
 function Login() {
   FirebaseInit();
-  let user = 0;
+  // let user = 0;
 
-  let registerUser = async () => {
-    // const formData = new FormData();
-    // formData.append("username", user.email);
-    // formData.append("password", "123");
-    // formData.append("email", user.email);
-    // // let myUser = await axios.get("http://localhost:8000/users/");
-    // // setUsers(myUser.data.results);
-    // // const result = users.filter(u.email === user.email);
-    // let response = await axios.post("http://localhost:8000/users/", formData);
-    // console.log(response.data);
-  };
+  // let registerUser = async () => {
+  //   // const formData = new FormData();
+  //   // formData.append("username", user.email);
+  //   // formData.append("password", "123");
+  //   // formData.append("email", user.email);
+  //   // // let myUser = await axios.get("http://localhost:8000/users/");
+  //   // // setUsers(myUser.data.results);
+  //   // // const result = users.filter(u.email === user.email);
+  //   // let response = await axios.post("http://localhost:8000/users/", formData);
+  //   // console.log(response.data);
+  // };
   // console.log(users);
-  const provider = new GoogleAuthProvider();
-  const handleGoogleSignedIn = () => {
-    const auth = getAuth();
-    signInWithPopup(auth, provider).then((result) => {
-      user = result.user;
-      console.log(user);
-      registerUser();
-    });
-  };
+  // const provider = new GoogleAuthProvider();
+  // const handleGoogleSignedIn = () => {
+  //   const auth = getAuth();
+  //   signInWithPopup(auth, provider).then((result) => {
+  //     user = result.user;
+  //     console.log(user);
+  //     registerUser();
+  //   });
+  // };
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [temp, setTemp] = useState();
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  // const [temp, setTemp] = useState();
 
   // const [isSignedIn, setIsSignedIn] = useState(false);
 
@@ -61,13 +65,20 @@ function Login() {
     event.preventDefault();
     try {
       let info = await axios.get("http://localhost:8000/oauth2/");
-      let token = await axios.post("http://localhost:8000/o/token/", {
-        client_id: info.data.client_id,
-        client_secret: info.data.client_secret,
-        username: username,
-        password: password,
-        grant_type: "password",
-      });
+      let token = await axios
+        .post("http://localhost:8000/o/token/", {
+          client_id: info.data.client_id,
+          client_secret: info.data.client_secret,
+          username: username,
+          password: password,
+          grant_type: "password",
+        })
+        .catch(function (error) {
+          console.log(error.response.status);
+          if (error.response.status === 400) {
+            handleShow();
+          }
+        });
 
       localStorage.setItem("token", token.data.access_token);
       cookie.save("token", token.data.access_token);
@@ -108,36 +119,50 @@ function Login() {
 
   // }, [])
 
-  const handleLogOut = () => {
-    const auth = getAuth();
-    signOut(auth)
-      .then(() => {
-        console.log("Logout");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
+  let errorPath = (
+    <>
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Ups!</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Bạn đã nhập sai tài khoản hoặc mật khẩu!</Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={handleClose}>
+            OK
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
 
-  const getData = () => {
-    let auth = getAuth();
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        let token = await user.getIdToken();
-        console.log(token);
-        const data = await axios.get("http://localhost:8000/categories/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setTemp(data.data);
-      } else {
-        // setIsSignedIn(false);
-      }
-    });
-  };
+  // const handleLogOut = () => {
+  //   const auth = getAuth();
+  //   signOut(auth)
+  //     .then(() => {
+  //       console.log("Logout");
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  // };
 
-  console.log(temp);
+  // const getData = () => {
+  //   let auth = getAuth();
+  //   onAuthStateChanged(auth, async (user) => {
+  //     if (user) {
+  //       let token = await user.getIdToken();
+  //       console.log(token);
+  //       const data = await axios.get("http://localhost:8000/categories/", {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+  //       setTemp(data.data);
+  //     } else {
+  //       // setIsSignedIn(false);
+  //     }
+  //   });
+  // };
 
   // const getRes = async () => {
   //   const data = await axios.get(
@@ -153,6 +178,7 @@ function Login() {
 
   return (
     <div className="Login">
+      {errorPath}
       <div className="fixed-login">
         <Link className="hello-23" to="/">
           <img src={logo} alt="fixed-logo" />
@@ -200,9 +226,9 @@ function Login() {
               </button>
             </form>
           </div>
-          <button onClick={handleGoogleSignedIn}>Đăng nhập với Google</button>
+          {/* <button onClick={handleGoogleSignedIn}>Đăng nhập với Google</button>
           <button onClick={handleLogOut}>Logout Google</button>
-          <button onClick={getData}>Get data</button>
+          <button onClick={getData}>Get data</button> */}
 
           <div className="next-login">
             <div>Bạn chưa có tài khoản?</div>

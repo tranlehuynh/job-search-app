@@ -1,7 +1,9 @@
+import Comment from "./comment/Comment";
+
 const JobDetailMain = (props) => {
   return (
     <>
-      <div className="w-100 d-flex justify-content-center mt-3">
+      <div className="w-100 d-flex justify-content-center mt-3 mb-4">
         <div className="w-75">
           <div className="d-flex justify-content-center">
             <div
@@ -37,6 +39,8 @@ const JobDetailMain = (props) => {
           </div>
         </div>
       </div>
+
+      <Comment />
     </>
   );
 };

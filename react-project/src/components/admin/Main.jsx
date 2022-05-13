@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button, Table, Modal, Form, Pagination } from "react-bootstrap";
 import Api, { endpoints } from "../../api/Api";
 import { Link, useSearchParams } from "react-router-dom";
-import axios from "axios";
 
 function Main() {
   const [updateShow, setUpdateShow] = useState(false);
@@ -16,7 +15,7 @@ function Main() {
   const [role, setRole] = useState("");
   const [q] = useSearchParams();
 
-  const [mypage, setMyPage] = useState([]);
+  const [count, setCount] = useState(0);
 
   const handleUpdateShow = () => setUpdateShow(true);
   const handleUpdateClose = () => setUpdateShow(false);
@@ -40,6 +39,7 @@ function Main() {
   const loadUser = async () => {
     let response = await Api.get(endpoints["users"]);
     setUser(response.data.results);
+    setCount(response.data.count);
   };
 
   const loadEmployerRegister = async () => {
@@ -81,6 +81,17 @@ function Main() {
     handleDeleteClose();
   };
 
+  //Pagination Count
+  let countPage = [];
+  for (let i = 1; i <= Math.ceil(count / 9); i++) {
+    countPage.push(
+      <div className="page-item" key={i}>
+        <Link className="page-link" to={"/admin/manage-user/?page=" + (i + 1)}>
+          {i + 1}
+        </Link>
+      </div>
+    );
+  }
   return (
     <>
       <Modal show={updateShow} onHide={handleUpdateClose}>
@@ -190,13 +201,6 @@ function Main() {
         >
           Đăng ký nhà tuyển dụng
         </Button>
-        <Button
-          variant="success"
-          className="float-end mt-5 mb-4"
-          style={{ marginRight: "8px" }}
-        >
-          Đăng ký công ty
-        </Button>
         <Table striped bordered hover size="sm" className="text-center">
           <thead>
             <tr>
@@ -263,6 +267,7 @@ function Main() {
               1
             </Link>
           </div>
+          {countPage}
         </Pagination>
       </div>
     </>
