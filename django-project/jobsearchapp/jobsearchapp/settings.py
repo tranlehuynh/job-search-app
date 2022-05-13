@@ -69,9 +69,9 @@ OAUTH2_INFO = {
     "client_secret": "JME3QNtmF7FaHhL5fP68natkrnsONaJ1xl7yLZhPu7a1RVLDrovzud530CQxqs6UphWUBU9gIKrgKrHayODkZBWnfXQXsgnskU7p01B5kP4Y744VkMGEza9Kb0rBXHNq"
 }
 
-# OAUTH2_PROVIDER = {
-#     'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
-# }
+OAUTH2_PROVIDER = {
+    'OAUTH2_BACKEND_CLASS': 'oauth2_provider.oauth2_backends.JSONOAuthLibCore',
+}
 
 CKEDITOR_UPLOAD_PATH = 'images/jobdetails'
 
