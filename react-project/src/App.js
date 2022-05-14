@@ -24,7 +24,7 @@ export default function App() {
       <Route path="/employer/employerCV" element={<EmployerCV />} />
       <Route path="/employer/information" element={<Information />} />
       <Route path="/employer-register/" element={<EmployerRegister />} />
-      <Route path="*" element={<ErrorPage />} />
+      {/* <Route path="*" element={<ErrorPage />} /> */}
       <Route path="/admin/manage-user/" element={<ManageUser />} />
     </Routes>
   )
