@@ -6,6 +6,8 @@
   <li>Cloning the project</li>
   <li>Creating an empty database with name as 'jobdb' using the database already create in github</li>
   <li>Creating and activating a virtual env and executing the command: pip install -r requirements.txt</li>
+  <li>pip install django-cors-headers </li>
+  <li>pip install django-allauth </li>
   <li>Executing the command: python manage.py migrate</li>
   <li>Running the server: python manage.py runserver</li>
 </ol>
