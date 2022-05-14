@@ -17,5 +17,6 @@
 <ol>
   <li>Moving to the project folder and executing the command: npm install</li>
   <li>Executing the command: yarn start or npm start</li>
+  <li>Admin account- username: admin, password: admin123 </li>
 </ol>
 
