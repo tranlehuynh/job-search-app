@@ -4,7 +4,7 @@
 <p><strong>In order to run the back-end project</strong></p>
 <ol>
   <li>Cloning the project</li>
-  <li>Creating an empty database with name as 'jobdb' using the database already create in github</li>
+  <li>Creating an empty database with name as 'jobdb' using use the database already have in my github</li>
   <li>Creating and activating a virtual env and executing the command: pip install -r requirements.txt</li>
   <li>pip install django-cors-headers </li>
   <li>pip install django-allauth </li>
