@@ -21,7 +21,9 @@ const Recruit = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const data = await axios.get("http://127.0.0.1:8000/categories/");
+      const data = await axios.get(
+        "http://tranlehuynh.pythonanywhere.com/categories/"
+      );
       setState(data.data);
     };
 

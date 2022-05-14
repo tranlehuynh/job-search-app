@@ -34,7 +34,7 @@ function Login() {
       formData.append("avatar", avatar.current.files[0]);
 
       let res = await axios
-        .post("http://localhost:8000/users/", formData, {
+        .post("http://tranlehuynh.pythonanywhere.com/users/", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

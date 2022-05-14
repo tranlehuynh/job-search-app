@@ -32,7 +32,7 @@ function Homepage() {
   const [getPageURL] = useSearchParams();
   const pageURL = getPageURL.get("page");
 
-  const APIJobs = "http://localhost:8000/jobs/";
+  const APIJobs = "http://tranlehuynh.pythonanywhere.com/jobs/";
 
   const myDispatch = useDispatch();
 
@@ -185,10 +185,12 @@ function Homepage() {
 
     nav(`/?kw=${kw}`);
 
-    axios.get(`http://127.0.0.1:8000/jobs/?kw=${kw}`).then((response) => {
-      setJobs(response.data.results);
-      setCount(response.data.count);
-    });
+    axios
+      .get(`http://tranlehuynh.pythonanywhere.com/jobs/?kw=${kw}`)
+      .then((response) => {
+        setJobs(response.data.results);
+        setCount(response.data.count);
+      });
   };
 
   // const resetData = () => {

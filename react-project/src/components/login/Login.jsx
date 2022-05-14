@@ -64,9 +64,11 @@ function Login() {
   const login = async (event) => {
     event.preventDefault();
     try {
-      let info = await axios.get("http://localhost:8000/oauth2/");
+      let info = await axios.get(
+        "http://tranlehuynh.pythonanywhere.com/oauth2/"
+      );
       let token = await axios
-        .post("http://localhost:8000/o/token/", {
+        .post("http://tranlehuynh.pythonanywhere.com/o/token/", {
           client_id: info.data.client_id,
           client_secret: info.data.client_secret,
           username: username,
@@ -83,7 +85,7 @@ function Login() {
       localStorage.setItem("token", token.data.access_token);
       cookie.save("token", token.data.access_token);
       let userLogin = await axios.get(
-        "http://localhost:8000/users/current-user/",
+        "http://tranlehuynh.pythonanywhere.com/users/current-user/",
         {
           headers: {
             Authorization: `Bearer ${cookie.load("token")}`,
