@@ -58,7 +58,6 @@ ChartJS.register(
 );
 
 function Charjs() {
-  const [count, setCount] = useState(0);
   const [chartData, setChartData] = useState({
     datasets: [],
   });
@@ -68,41 +67,40 @@ function Charjs() {
   useEffect(() => {
     const loadData = async () => {
       const res = await Api.get(endpoints["CV"]);
-      setCount(res.data.length);
+      setChartData({
+        labels: ["Hôm kia", "Hôm qua", "Hôm nay"],
+        datasets: [
+          {
+            label: "Số lượng CV là",
+            data: [1, 3, res.data.length],
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      });
+      setChartOptions({
+        responsive: true,
+        maintainAspectRadio: false,
+        plugins: {
+          legend: {
+            position: "left",
+          },
+          title: {
+            display: true,
+            text: "Số lượng CV",
+          },
+        },
+      });
     };
-    setChartData({
-      labels: ["Hôm kia", "Hôm qua", "Hôm nay"],
-      datasets: [
-        {
-          label: "Số lượng CV là",
-          data: [1, 3, count],
-          backgroundColor: [
-            "rgba(255, 99, 132, 0.2)",
-            "rgba(54, 162, 235, 0.2)",
-            "rgba(255, 206, 86, 0.2)",
-          ],
-          borderColor: [
-            "rgba(255, 99, 132, 1)",
-            "rgba(54, 162, 235, 1)",
-            "rgba(255, 206, 86, 1)",
-          ],
-          borderWidth: 1,
-        },
-      ],
-    });
-    setChartOptions({
-      responsive: true,
-      maintainAspectRadio: false,
-      plugins: {
-        legend: {
-          position: "left",
-        },
-        title: {
-          display: true,
-          text: "Số lượng CV",
-        },
-      },
-    });
 
     loadData();
   }, []);

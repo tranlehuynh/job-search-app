@@ -80,7 +80,9 @@ function Comment() {
         },
       }
     );
-    setState(value);
+    let temp = Math.random() * 99;
+    setState(temp);
+    setValue("");
   };
 
   const deleteComment = async (id) => {
@@ -94,7 +96,7 @@ function Comment() {
         handleShow();
       }
     });
-    let temp = Math.random() * 999999;
+    let temp = Math.random() * 99;
     setState(temp);
   };
 
@@ -115,8 +117,8 @@ function Comment() {
         handleShow();
       }
     });
-    handleClose1();
     setState(content);
+    handleClose1();
   };
 
   const handleId = (id) => {

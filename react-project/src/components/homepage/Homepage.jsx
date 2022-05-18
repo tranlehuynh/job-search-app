@@ -180,6 +180,8 @@ function Homepage() {
     });
   };
 
+  console.log(count);
+
   useEffect(() => {
     if (pageURL != null) {
       jobsAPI(`${"?page="}${pageURL}`);
@@ -198,15 +200,16 @@ function Homepage() {
 
   //Pagination Count
   let countPage = [];
-  for (let i = 1; i <= Math.ceil(count / 7); i++) {
-    <div className="page-item" key={i}>
-      <Link className="page-link" to={"/?page=" + (i + 1)}>
-        {i + 1}
-      </Link>
-    </div>;
+  for (let i = 1; i <= Math.ceil(count / 20); i++) {
+    let count1 = Math.ceil(count / 20);
+    // <div className="page-item" key={i}>
+    //   <Link className="page-link" to={"/?page=" + (i + 1)}>
+    //     {i + 1}
+    //   </Link>
+    // </div>;
     countPage.push(
       <div className="page-item" key={i}>
-        <Link className="page-link" to={"/?page=" + (i + 1)}>
+        <Link className="page-link" to={`/?page=${i + 1}`}>
           {i + 1}
         </Link>
       </div>
@@ -237,8 +240,9 @@ function Homepage() {
   };
 
   const searchParttime = async () => {
-    const res = await jobs.filter((job) => job.id === 2);
-    console.log(res);
+    const res = await jobs.filter(
+      (job) => job.job_category.name === "Parttime"
+    );
     setJobs(res);
   };
 
@@ -377,18 +381,11 @@ function Homepage() {
               <div onClick={searchAll}>Tất cả</div>
             </li>
             <li>
-              <div
-                onClick={() => {
-                  jobsAPI(`${"?page="}${pageURL}`);
-                  searchParttime();
-                }}
-              >
-                Bán thời gian
-              </div>
+              <div onClick={searchParttime}>Bán thời gian</div>
             </li>
-            <li>
+            {/* <li>
               <div onClick={searchFulltime}>Toàn thời gian</div>
-            </li>
+            </li> */}
           </ul>
         </div>
 
@@ -444,7 +441,7 @@ function Homepage() {
                           d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
                         />
                       </svg>
-                      <div>9 triệu</div>
+                      <div>{job.salary}</div>
                     </div>
                   </div>
                 </Link>
