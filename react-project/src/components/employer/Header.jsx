@@ -10,6 +10,8 @@ const Header = () => {
 
   const myDispatch = useDispatch();
   const logOut = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     cookie.remove("token");
     cookie.remove("user");
     myDispatch(logoutUser());

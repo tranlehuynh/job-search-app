@@ -10,9 +10,21 @@ export const endpoints = {
     "deleteUsers": (id) => `/users/${id}/`,
     "jobs": (id) => `/jobs/${id}/`,
     "createJob": "/jobs/",
-    "createCompany": "/companies/"
+    "createCompany": "/companies/",
+    "oauth2-token": "/oauth2/",
+    "load-comment": "/comments/",
+    "upload-cv": (id) => `/users/${id}/cv/`,
+    "patch-cv": (id) => `/cv/${id}/`,
+    "CV": "/cv/",
+    "addComment": (id) => `/jobs/${id}/add-comment/`,
+    "deleteComment": (id) => `/comments/${id}/`,
+    "updateComment": (id) => `/comments/${id}/`,
+    "upCV": "/CVapplyCompanies/",
+    "patchCV": (id) => `/users/${id}/cv/`,
+    "getRating": (companyId) => `/companies/${companyId}/get_rate/`,
+    "postRating": (companyId) => `/companies/${companyId}/rating/`,
 }
 
 export default axios.create({
-    baseURL: "http://tranlehuynh.pythonanywhere.com/"
+    baseURL: "https://tranlehuynh.pythonanywhere.com/"
 })

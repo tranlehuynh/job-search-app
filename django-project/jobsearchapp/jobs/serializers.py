@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import Category, Job, User, Company, JobCategory, Comment, CVOnline, Action, Rating, CompanyView
+from .models import Category, Job, User, Company, JobCategory, Comment, CVOnline, Action, Rating, CompanyView, \
+    CVApplyCompany
+
+
+class CVApplyCompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CVApplyCompany
+        fields = "__all__"
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -23,7 +30,13 @@ class CompanySerializer(serializers.ModelSerializer):
 class JobNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Company
-        fields = ['company_name']
+        fields = ['company_name', 'address', 'id']
+
+
+class CompanyNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username']
 
 
 class JobTypeSerializer(serializers.ModelSerializer):
@@ -36,21 +49,6 @@ class JobSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField(source='image')
     company = JobNameSerializer()
     job_category = JobTypeSerializer()
-
-    # like = serializers.SerializerMethodField()
-    # rating = serializers.SerializerMethodField()
-    #
-    # def get_like(self, job_name):
-    #     request = self.context.get('request')
-    #     if request:
-    #         return job_name.like.set.filter(user=request.user, active=True).exists()
-    #
-    # def get_rating(self, job_name):
-    #     request = self.context.get('request')
-    #     if request:
-    #         r = job_name.rating_set.filter(user=request.user).first()
-    #         if r:
-    #             return r.rate
 
     def get_image(self, obj):
         request = self.context['request']
@@ -131,10 +129,19 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
+class JobIDSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = ['id']
+
+
 class CreateCommentSerializer(serializers.ModelSerializer):
+    user = CompanyNameSerializer()
+    job = JobIDSerializer()
+
     class Meta:
         model = Comment
-        fields = ['content', 'user', 'created_date']
+        fields = ['id', 'content', 'user', 'created_date', 'job']
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -152,10 +159,25 @@ class ActionSerializer(serializers.ModelSerializer):
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
-        fields = ['id', 'rate', 'created_date']
+        fields = ['id', 'rate', 'created_date', 'user_id']
 
 
 class CompanyViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyView
         fields = ['id', 'views', 'company']
+
+
+class StatisticSerializer(serializers.ModelSerializer):
+    cv = serializers.SerializerMethodField(source='cv')
+
+    class Meta:
+        model = CVOnline
+        fields = '__all__'
+
+    def get_cv(self, obj):
+        request = self.context['request']
+        if obj.cv and not obj.cv.name.startswith("/static"):
+            path = '/static/%s' % obj.cv.name
+
+            return request.build_absolute_uri(path)

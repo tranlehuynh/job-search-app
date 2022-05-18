@@ -1,4 +1,4 @@
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Modal } from "react-bootstrap";
 import Header from "./Header";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -69,10 +69,23 @@ const Recruit = () => {
     console.log(res.data);
   };
 
+  const [show, setShow] = useState(false);
+  const handleShow = () => setShow(true);
+  const handleClose = () => setShow(false);
+
   if (user !== null && user !== undefined) {
     if (user.role === 2) {
       path = (
         <>
+          <Modal show={show} onHide={handleClose}>
+            <Modal.Header>Thông báo</Modal.Header>
+            <Modal.Body>Đăng tin thành công</Modal.Body>
+            <Modal.Footer>
+              <Button variant="primary" onClick={handleClose}>
+                OK
+              </Button>
+            </Modal.Footer>
+          </Modal>
           <Header />
           <Form
             className="col-md-5 m-auto rounded border p-3 mt-3"
@@ -154,7 +167,7 @@ const Recruit = () => {
               name="login-avatar-1"
             /> */}
             <div className="text-center">
-              <Button variant="primary" type="submit">
+              <Button variant="primary" type="submit" onClick={handleShow}>
                 Đăng tin
               </Button>
             </div>

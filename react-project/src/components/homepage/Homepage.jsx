@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import cookie from "react-cookies";
-import { Form, FormControl, Pagination, Button } from "react-bootstrap";
+import { Form, FormControl, Pagination, Button, Modal } from "react-bootstrap";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -19,7 +19,7 @@ import logoPicture from "./../../assets/logo/logo-stadia.png";
 import informationPicture from "./../../assets/logo/google-icon.png";
 import homeTeamWorkPicture from "./../../assets/svg-images/home-teamworks.svg";
 import Footer from "../footer/Footer";
-import ReactPaginate from "react-paginate";
+import Api, { endpoints } from "../../api/Api";
 
 function Homepage() {
   const [jobs, setJobs] = useState([]);
@@ -31,6 +31,7 @@ function Homepage() {
 
   const [getPageURL] = useSearchParams();
   const pageURL = getPageURL.get("page");
+  let cv = useRef();
 
   const APIJobs = "http://tranlehuynh.pythonanywhere.com/jobs/";
 
@@ -112,7 +113,28 @@ function Homepage() {
       </div>
     </>
   );
+  const [show, setShow] = useState(false);
+  const [cvTemp, setCVTemp] = useState("");
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [cvg, setCV] = useState([]);
+
   const user = useSelector((state) => state.user.user);
+
+  const uploadCV = async () => {
+    const formData = new FormData();
+    formData.append("cv", cv.current.files[0]);
+    const res = await Api.post(endpoints["upload-cv"](user.id), formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    console.log(res.data);
+    handleClose();
+  };
+
   if (user !== null && user !== undefined) {
     loginPath = (
       <>
@@ -137,6 +159,14 @@ function Homepage() {
             Đăng xuất
           </Link>
         </li>
+        <li>
+          <div
+            style={{ cursor: "pointer", color: "#d9d9d9" }}
+            onClick={handleShow}
+          >
+            Cập nhật CV
+          </div>
+        </li>
       </>
     );
   }
@@ -154,20 +184,27 @@ function Homepage() {
     if (pageURL != null) {
       jobsAPI(`${"?page="}${pageURL}`);
     }
-  }, [pageURL]);
+
+    const loadCV = async () => {
+      const res = await Api.get(endpoints["CV"]);
+      const data = res.data.filter((r) => r.user_id === user.id);
+      console.log(data);
+      setCV(data);
+    };
+    if (user !== undefined && user !== null) {
+      loadCV();
+    }
+  }, [pageURL, user]);
 
   //Pagination Count
   let countPage = [];
-  for (let i = 1; i <= Math.ceil(count / 8); i++) {
+  for (let i = 1; i <= Math.ceil(count / 7); i++) {
     <div className="page-item" key={i}>
       <Link className="page-link" to={"/?page=" + (i + 1)}>
         {i + 1}
       </Link>
     </div>;
     countPage.push(
-      // <Pagination.Item key={i}>
-      //   <Link to={"/?page=" + (i + 1)}>{i + 1}</Link>
-      // </Pagination.Item>
       <div className="page-item" key={i}>
         <Link className="page-link" to={"/?page=" + (i + 1)}>
           {i + 1}
@@ -193,10 +230,6 @@ function Homepage() {
       });
   };
 
-  // const resetData = () => {
-  //   setJobs(test);
-  // };
-
   const searchFulltime = async () => {
     const res = jobs.filter((job) => job.id === 1);
     console.log(res);
@@ -213,17 +246,69 @@ function Homepage() {
     setJobs(test);
   };
 
-  // const handleClick = (data) => {
-  //   console.log(data.selected);
-  //   <Link to={`${"?page="}${data.selected + 1}`}></Link>;
-  //   jobsAPI(`${"?page="}${data.selected + 1}`);
-  // };
+  const patchCV = async () => {
+    const formData = new FormData();
+    formData.append("cv", cv.current.files[0]);
+    const res = await Api.patch(endpoints["patchCV"](user.id), formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
 
-  // const myF = (e) => {
-  //   e.preventDefault();
-  // };
+    console.log(res.data);
+  };
+
+  let buttonUploadCV = (
+    <>
+      <Button variant="secondary" onClick={uploadCV} disabled>
+        Đăng CV
+      </Button>
+    </>
+  );
+
+  if (cvTemp !== "") {
+    if (cvg.length === 0) {
+      buttonUploadCV = (
+        <>
+          <Button variant="secondary" onClick={uploadCV}>
+            Đăng CV
+          </Button>
+        </>
+      );
+    } else {
+      buttonUploadCV = (
+        <>
+          <Button variant="secondary" onClick={patchCV}>
+            Đăng CV
+          </Button>
+        </>
+      );
+    }
+  }
   return (
     <div className="homepage">
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Cập nhật CV</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form.Group className="mb-3" controlId="formBasicFirstName1">
+            <Form.Label>CV </Form.Label>
+            <Form.Control
+              type="file"
+              placeholder="Chọn tệp"
+              ref={cv}
+              onChange={(e) => setCVTemp(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          {buttonUploadCV}
+          {/* <Button variant="primary" onClick={handleClose}>
+            Cập nhật CV
+          </Button> */}
+        </Modal.Footer>
+      </Modal>
       <nav className="navigation">
         <div className="logo">
           <img src={logoPicture} alt="logoPicture"></img>
@@ -240,10 +325,10 @@ function Homepage() {
               </a>
             </li>
             <li>
-              <a href="/#">Việc làm</a>
+              <a href="#toJob">Việc làm</a>
             </li>
             <li>
-              <a href="/#">Về chúng tôi</a>
+              <a href="#toJob">Về chúng tôi</a>
             </li>
 
             {path}
@@ -286,7 +371,7 @@ function Homepage() {
 
       <div className="jobs-find">
         <div className="jobs-nav">
-          <h2>Việc làm đang tuyển</h2>
+          <h2 id="toJob">Việc làm đang tuyển</h2>
           <ul>
             <li>
               <div onClick={searchAll}>Tất cả</div>
@@ -367,60 +452,12 @@ function Homepage() {
             })}
           </div>
           <div>
-            {/* <ReactPaginate
-              breakLabel={"..."}
-              pageCount={25}
-              previousLabel={"<"}
-              nextLabel={">"}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={3}
-              onPageChange={handleClick}
-              containerClassName="pagination"
-              pageClassName="page-item"
-              pageLinkClassName="page-link"
-              page
-              previousClassName="page-link"
-              nextLinkClassName="page-link"
-              breakLinkClassName="page-link"
-              disableInitialCallback={true}
-              initialPage={1}
-              activeClassName="page-item active"
-              href
-              hrefBuilder={(currentPage) => {
-                <div href={currentPage}>{currentPage}</div>;
-              }}
-            /> */}
             <Pagination>
-              {/* <Pagination.First />
-              <Pagination.Prev /> */}
               <div className="page-item">
                 <Link className="page-link" to={"/?page=1"}>
                   {1}
                 </Link>
               </div>
-              {/* <div className="page-item">
-                <Link className="page-link" to={"/?page=2"}>
-                  {2}
-                </Link>
-              </div>
-              <div className="page-item">
-                <Link className="page-link" to={"/?page=3"}>
-                  {3}
-                </Link>
-              </div>
-              <div className="page-item">
-                <Link className="page-link" to={"/?page=4"}>
-                  {4}
-                </Link>
-              </div>
-              <div className="page-item">
-                <Link className="page-link" to={"/?page=5"}>
-                  {5}
-                </Link>
-              </div> */}
-              {/* <Pagination.Next />
-              <Pagination.Last /> */}
-
               {countPage}
             </Pagination>
           </div>

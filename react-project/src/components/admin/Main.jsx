@@ -83,7 +83,7 @@ function Main() {
 
   //Pagination Count
   let countPage = [];
-  for (let i = 1; i <= Math.ceil(count / 9); i++) {
+  for (let i = 1; i <= Math.ceil(count / 10); i++) {
     countPage.push(
       <div className="page-item" key={i}>
         <Link className="page-link" to={"/admin/manage-user/?page=" + (i + 1)}>
@@ -194,7 +194,7 @@ function Main() {
           Bảng nhân viên
         </Button>
         <Button
-          variant="success"
+          variant="primary"
           onClick={loadEmployerRegister}
           className="float-end mt-5 mb-4"
           style={{ marginRight: "8px" }}

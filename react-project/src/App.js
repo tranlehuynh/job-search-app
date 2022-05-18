@@ -11,6 +11,7 @@ import Home from './components/home/Home'
 import ManageUser from './components/admin/ManageUser'
 import EmployerRegister from './components/employer/EmployerRegister'
 import ErrorPage from './components/ErrorPage'
+import EmployerJob from './components/employer/EmployerJob'
 
 export default function App() {
   return (
@@ -23,9 +24,11 @@ export default function App() {
       <Route path="/employer/recruit" element={<Recruit />} />
       <Route path="/employer/employerCV" element={<EmployerCV />} />
       <Route path="/employer/information" element={<Information />} />
+      <Route path="/employer/jobs/" element={<EmployerJob />} />
       <Route path="/employer-register/" element={<EmployerRegister />} />
-      {/* <Route path="*" element={<ErrorPage />} /> */}
+      <Route path="*" element={<ErrorPage />} />
       <Route path="/admin/manage-user/" element={<ManageUser />} />
+
     </Routes>
   )
 }

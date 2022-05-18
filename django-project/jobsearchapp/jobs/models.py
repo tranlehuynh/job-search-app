@@ -58,15 +58,18 @@ class Job(ModelBase):
     #     unique_together = ('job_name', 'category')
 
 
-# class UserApply(ModelBase):
-#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='jobs_applied')
-#     job = models.ForeignKey(Job, on_delete=models.CASCADE, related_name='jobs_applied')
-
-
 class CVOnline(ModelBase):
     cv = models.FileField(null=True, upload_to='CV Templates/%Y/%m')
     user_id = models.OneToOneField(User, on_delete=models.CASCADE, null=True, related_name='cv')
     company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, related_name='CVOnlines')
+
+
+class CVApplyCompany(models.Model):
+    CV = models.ForeignKey(CVOnline, on_delete=models.CASCADE)
+    company = models.ForeignKey(Company, on_delete=models.CASCADE)
+
+    # def __str__(self):
+    #     return self.id
 
 
 class Comment(ModelBase):

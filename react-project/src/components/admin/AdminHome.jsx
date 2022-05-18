@@ -35,10 +35,10 @@ function AdminHome() {
         <Card.Body>
           <Card.Title>{user.first_name + " " + user.last_name}</Card.Title>
           <Card.Text>Administrator</Card.Text>
-          <div className="d-flex justify-content-around">
+          {/* <div className="d-flex justify-content-around">
             <Button variant="primary">Xem hồ sơ</Button>
             <Button variant="secondary">Sửa hồ sơ</Button>
-          </div>
+          </div> */}
         </Card.Body>
       </>
     );
@@ -47,6 +47,8 @@ function AdminHome() {
   const myDispatch = useDispatch();
   const logOut = (event) => {
     event.preventDefault();
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     cookie.remove("token");
     cookie.remove("user");
     myDispatch(logoutUser());
@@ -133,13 +135,14 @@ function AdminHome() {
             </div>
 
             <div className="d-flex justify-content-between">
-              <div
+              <Link
+                to="/"
                 style={{
                   width: "8.5rem",
                   height: "9rem",
                   backgroundColor: "rgba(254,243,240,255)",
                 }}
-                className="mt-4"
+                className="mt-4 text-decoration-none"
               >
                 <Card.Body style={{ color: "#ad796d" }}>
                   <Card.Title>Thống kê</Card.Title>
@@ -153,14 +156,15 @@ function AdminHome() {
                     <div>Xem số liệu thống kê</div>
                   </Card.Text>
                 </Card.Body>
-              </div>
-              <div
+              </Link>
+              <Link
+                to="/admin/manage-user"
                 style={{
                   width: "8.5rem",
                   height: "9rem",
                   backgroundColor: "rgba(242,232,255,255)",
                 }}
-                className="mt-4"
+                className="mt-4 text-decoration-none"
               >
                 <Card.Body style={{ color: "#9288c3" }}>
                   <Card.Title>Quản lý</Card.Title>
@@ -174,7 +178,7 @@ function AdminHome() {
                     <div>Quản lý nhân viên</div>
                   </Card.Text>
                 </Card.Body>
-              </div>
+              </Link>
             </div>
           </div>
         </Col>

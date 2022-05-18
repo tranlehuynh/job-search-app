@@ -28,6 +28,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { Line, Bar, Pie } from "react-chartjs-2";
+import Api, { endpoints } from "../../../api/Api";
 
 ChartJS.register(
   ArcElement,
@@ -57,6 +58,7 @@ ChartJS.register(
 );
 
 function Charjs() {
+  const [count, setCount] = useState(0);
   const [chartData, setChartData] = useState({
     datasets: [],
   });
@@ -64,14 +66,26 @@ function Charjs() {
   const [chartOptions, setChartOptions] = useState({});
 
   useEffect(() => {
+    const loadData = async () => {
+      const res = await Api.get(endpoints["CV"]);
+      setCount(res.data.length);
+    };
     setChartData({
-      labels: ["John", "Kevin"],
+      labels: ["Hôm kia", "Hôm qua", "Hôm nay"],
       datasets: [
         {
-          label: "Whom let the dogs out",
-          data: [12, 55, 44],
-          backgroundColor: "rgba(255, 99, 132, 0.2)",
-          borderColor: "rgba(255, 99, 132, 1)",
+          label: "Số lượng CV là",
+          data: [1, 3, count],
+          backgroundColor: [
+            "rgba(255, 99, 132, 0.2)",
+            "rgba(54, 162, 235, 0.2)",
+            "rgba(255, 206, 86, 0.2)",
+          ],
+          borderColor: [
+            "rgba(255, 99, 132, 1)",
+            "rgba(54, 162, 235, 1)",
+            "rgba(255, 206, 86, 1)",
+          ],
           borderWidth: 1,
         },
       ],
@@ -85,10 +99,12 @@ function Charjs() {
         },
         title: {
           display: true,
-          text: "Whom let the dog out",
+          text: "Số lượng CV",
         },
       },
     });
+
+    loadData();
   }, []);
   return (
     <div className="Charjs">

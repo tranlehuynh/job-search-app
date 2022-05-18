@@ -1,3 +1,5 @@
+from typing import Union
+
 from rest_framework import viewsets, generics, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -5,18 +7,23 @@ from django.http import Http404
 from rest_framework.views import APIView
 from django.conf import settings
 
-from .models import Category, Job, User, Comment, Rating, Company, JobCategory, CVOnline, Action, CompanyView
+from .models import Category, Job, User, Comment, Rating, Company, JobCategory, CVOnline, Action, CompanyView, CVApplyCompany
 from .serializers import (
     CategorySerializer, JobSerializer, UserSerializer,
     CommentSerializer, CreateCommentSerializer,
     JobCategorySerializer, CompanySerializer,
     CVSerializer, RatingSerializer,
-    ActionSerializer, CompanyViewSerializer
+    ActionSerializer, CompanyViewSerializer, CompanyNameSerializer, CVApplyCompanySerializer
 )
 from .paginators import JobPaginator, UserPaginator
 from drf_yasg.utils import swagger_auto_schema
 from .perms import CommentOwnerPerms
 from django.db.models import F
+
+
+class CVApplyCompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIView):
+    queryset = CVApplyCompany.objects.filter()
+    serializer_class = CVApplyCompanySerializer
 
 
 class CategoryViewset(viewsets.ViewSet, generics.ListAPIView):
@@ -52,7 +59,7 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIV
     serializer_class = CompanySerializer
 
     def get_permissions(self):
-        if self.action in ['take_action', 'rate']:
+        if self.action in ['take_action', 'rating']:
             return [permissions.IsAuthenticated()]
 
         return [permissions.AllowAny()]
@@ -70,7 +77,7 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIV
     def take_action(self, request, pk):
         try:
             action_type = int(request.data['type'])
-        except IndexError | ValueError as ex:
+        except Union[IndexError, ValueError] as ex:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             action = Action.objects.create(type=action_type,
@@ -79,16 +86,35 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.CreateAPIV
             return Response(ActionSerializer(action).data, status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True, url_path='rating')
-    def rate(self, request, pk):
-        try:
-            rating = int(request.data['rating'])
-        except IndexError | ValueError as ex:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            r = Rating.objects.create(rate=rating,
-                                      user=request.user, company=self.get_object())
+    def rating(self, request, pk):
+        company = self.get_object()
+        user = request.user
+        rating_count = int(request.data.get('rating'))
 
-            return Response(RatingSerializer(r).data, status=status.HTTP_200_OK)
+        if rating_count > 5 or rating_count < 1:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        r, _ = Rating.objects.get_or_create(company=company, user=user)
+        r.rate = request.data.get('rating', 5)
+
+        try:
+            r.save()
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data=RatingSerializer(r, context={'request': request}).data,
+                        status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path='get_rate')
+    def get_rate(self, request, pk):
+        rate = self.get_object().rating_set
+
+        return Response(RatingSerializer(rate, many=True).data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=True, url_path='get_cv')
+    def get_cv(self, request, pk):
+        cv = self.get_object().cvapplycompany_set
+
+        return Response(CVApplyCompanySerializer(cv, many=True).data, status=status.HTTP_200_OK)
 
     @action(methods=['get'], detail=True, url_path='views')
     def count_view(self, request, pk):
@@ -133,8 +159,8 @@ class JobViewSet(viewsets.ViewSet, generics.UpdateAPIView, generics.RetrieveAPIV
 
     def get_queryset(self):
         job = self.queryset
-        category_id = self.request.query_params('category_id')
-        company_id = self.request.query_params('company_id')
+        category_id = self.request.query_params.get('category_id')
+        company_id = self.request.query_params.get('company_id')
 
         if category_id:
             job = job.filter(category_id=category_id)
@@ -232,6 +258,12 @@ class UserViewSet(viewsets.ViewSet, generics.CreateAPIView, generics.ListAPIView
                         status=status.HTTP_200_OK)
 
 
+class StatisticViewSet(viewsets.ViewSet, generics.ListAPIView):
+    queryset = CVOnline.objects.filter(active=True)
+    serializer_class = CVSerializer
+
+
 class Oauth2(APIView):
     def get(self, request):
         return Response(settings.OAUTH2_INFO, status=status.HTTP_200_OK)
+

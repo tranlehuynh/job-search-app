@@ -14,49 +14,30 @@ import informationPicture from "./../../assets/logo/google-icon.png";
 import logo from "./../../assets/logo/logo-stadia.png";
 
 import FirebaseInit from "../../firebase/FirebaseInit";
-// import {
-//   // getAuth,
-//   // signInWithPopup,
-//   GoogleAuthProvider,
-//   // onAuthStateChanged,
-//   // signOut,
-// } from "firebase/auth";
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+} from "firebase/auth";
 import { Button, Modal } from "react-bootstrap";
 
 function Login() {
   FirebaseInit();
-  // let user = 0;
 
-  // let registerUser = async () => {
-  //   // const formData = new FormData();
-  //   // formData.append("username", user.email);
-  //   // formData.append("password", "123");
-  //   // formData.append("email", user.email);
-  //   // // let myUser = await axios.get("http://localhost:8000/users/");
-  //   // // setUsers(myUser.data.results);
-  //   // // const result = users.filter(u.email === user.email);
-  //   // let response = await axios.post("http://localhost:8000/users/", formData);
-  //   // console.log(response.data);
-  // };
-  // console.log(users);
-  // const provider = new GoogleAuthProvider();
-  // const handleGoogleSignedIn = () => {
-  //   const auth = getAuth();
-  //   signInWithPopup(auth, provider).then((result) => {
-  //     user = result.user;
-  //     console.log(user);
-  //     registerUser();
-  //   });
-  // };
+  const provider = new GoogleAuthProvider();
+  const handleGoogleSignedIn = () => {
+    const auth = getAuth();
+    signInWithPopup(auth, provider).then((result) => {
+      console.log(result.user);
+    });
+  };
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  // const [temp, setTemp] = useState();
-
-  // const [isSignedIn, setIsSignedIn] = useState(false);
 
   const dispatch = useDispatch();
   const history = useNavigate();
@@ -82,7 +63,7 @@ function Login() {
           }
         });
 
-      localStorage.setItem("token", token.data.access_token);
+      // localStorage.setItem("token", token.data.access_token);
       cookie.save("token", token.data.access_token);
       let userLogin = await axios.get(
         "http://tranlehuynh.pythonanywhere.com/users/current-user/",
@@ -92,7 +73,7 @@ function Login() {
           },
         }
       );
-      localStorage.setItem("user", userLogin.data);
+      // localStorage.setItem("user", userLogin.data);
       cookie.save("user", userLogin.data);
       dispatch(loginUser(userLogin.data));
 
@@ -101,25 +82,6 @@ function Login() {
       console.log(error);
     }
   };
-
-  // let responseGoogle = (response) => {
-  //   setGoogleTokenId(response.tokenId);
-  // };
-  // const isLogin = () => {
-  //   let auth = getAuth();
-  //   onAuthStateChanged(auth, (user) => {
-  //     if (user) {
-  //       setIsSignedIn(true);
-  //       // registerUser();
-  //     } else {
-  //       setIsSignedIn(false);
-  //     }
-  //   });
-  // };
-
-  // useEffect(() => {
-
-  // }, [])
 
   let errorPath = (
     <>
@@ -137,46 +99,16 @@ function Login() {
     </>
   );
 
-  // const handleLogOut = () => {
-  //   const auth = getAuth();
-  //   signOut(auth)
-  //     .then(() => {
-  //       console.log("Logout");
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  // };
-
-  // const getData = () => {
-  //   let auth = getAuth();
-  //   onAuthStateChanged(auth, async (user) => {
-  //     if (user) {
-  //       let token = await user.getIdToken();
-  //       console.log(token);
-  //       const data = await axios.get("http://localhost:8000/categories/", {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //       });
-  //       setTemp(data.data);
-  //     } else {
-  //       // setIsSignedIn(false);
-  //     }
-  //   });
-  // };
-
-  // const getRes = async () => {
-  //   const data = await axios.get(
-  //     "http://thanhduong.pythonanywhere.com/categories/",
-  //     {
-  //       headers: {
-  //         Authorization: `Bearer ${token}`,
-  //       },
-  //     }
-  //   );
-  //   setTemp(data.data);
-  // };
+  const handleLogOut = () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        console.log("Logout");
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   return (
     <div className="Login">
@@ -192,10 +124,11 @@ function Login() {
         <div className="login-form-header">
           <h1>Đăng nhập</h1>
           <div>
-            <div>
+            <div onClick={handleGoogleSignedIn}>
               <img src={informationPicture} alt="informationPicture" />
               <p id="login-by-google">Đăng nhập bằng Google</p>
             </div>
+            <div onClick={handleLogOut}>Logout Google</div>
           </div>
         </div>
 
@@ -228,9 +161,7 @@ function Login() {
               </button>
             </form>
           </div>
-          {/* <button onClick={handleGoogleSignedIn}>Đăng nhập với Google</button>
-          <button onClick={handleLogOut}>Logout Google</button>
-          <button onClick={getData}>Get data</button> */}
+          {/* <button onClick={handleGoogleSignedIn}>Đăng nhập với Google</button> */}
 
           <div className="next-login">
             <div>Bạn chưa có tài khoản?</div>

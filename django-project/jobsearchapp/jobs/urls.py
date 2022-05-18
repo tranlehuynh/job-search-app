@@ -14,7 +14,8 @@ router.register(prefix='users', viewset=views.UserViewSet, basename='user')
 router.register(prefix='jobcategories', viewset=views.JobCategoryViewSet, basename='jobcategory')
 router.register(prefix='companies', viewset=views.CompanyViewSet, basename='company')
 router.register(prefix='cv', viewset=views.CVViewSet, basename='cv')
-
+router.register(prefix='CVapplyCompanies', viewset=views.CVApplyCompanyViewSet, basename='CVapplyCompanies')
+router.register(prefix='Statistic', viewset=views.StatisticViewSet, basename='Statistic')
 
 urlpatterns = [
     path('', include(router.urls)),

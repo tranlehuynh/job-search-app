@@ -19,13 +19,14 @@ const JobDetail = () => {
   let path;
   let path2;
   if (job.length !== 0) {
-    console.log(job);
     path = (
       <>
         <JobDetailHeader
           name={job.job_name}
           salary={job.salary}
           company={job.company.company_name}
+          address={job.company.address}
+          companyId={job.company.id}
         />
       </>
     );
@@ -37,6 +38,7 @@ const JobDetail = () => {
           company={job.company.company_name}
           category={job.job_category.name}
           descriptions={job.description}
+          address={job.company.address}
         />
       </>
     );

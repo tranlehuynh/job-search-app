@@ -12,56 +12,37 @@ const Information = () => {
   const [updateShow, setUpdateShow] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
+  // const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const handleUpdateShow = () => setUpdateShow(true);
   const handleUpdateClose = () => setUpdateShow(false);
 
   const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
-    const showUser = (firstName, lastName, username, email) => {
+    const showUser = (firstName, lastName, email) => {
       setFirstName(firstName);
       setLastName(lastName);
-      setUsername(username);
+      // setUsername(username);
       setEmail(email);
     };
-    showUser(user.first_name, user.last_name, user.username, user.email);
-  }, [user.first_name, user.last_name, user.username, user.email]);
+    showUser(user.first_name, user.last_name, user.email);
+  }, [user.first_name, user.last_name, user.email]);
   const updateUser = async () => {
-    if (password !== "" && password !== undefined && password !== null) {
-      const response = await Api.patch(endpoints["updateUsers"](user.id), {
-        first_name: firstName,
-        last_name: lastName,
-        username: username,
-        email: email,
-        password: password,
-      });
+    const res = await Api.patch(endpoints["updateUsers"](user.id), {
+      first_name: firstName,
+      last_name: lastName,
+      // username: username,
+      email: email,
+    });
 
-      user.first_name = firstName;
-      user.last_name = lastName;
-      user.email = email;
+    user.first_name = firstName;
+    user.last_name = lastName;
+    user.email = email;
 
-      handleUpdateClose();
-      console.log(response.data);
-      console.log(1);
-    } else {
-      const res = await Api.patch(endpoints["updateUsers"](user.id), {
-        first_name: firstName,
-        last_name: lastName,
-        username: username,
-        email: email,
-      });
-
-      user.first_name = firstName;
-      user.last_name = lastName;
-      user.email = email;
-
-      handleUpdateClose();
-      console.log(res.data);
-      console.log(2);
-    }
+    handleUpdateClose();
+    console.log(res.data);
+    console.log(2);
   };
 
   let path = <ErrorPage />;
@@ -103,7 +84,7 @@ const Information = () => {
                     </Link>
                   </div>
                 </div>
-                <div className="border rounded d-flex align-items-center m-1 p-4">
+                {/* <div className="border rounded d-flex align-items-center m-1 p-4">
                   <div style={{ marginRight: "7px" }}>
                     <FontAwesomeIcon
                       icon={faUserTie}
@@ -112,11 +93,11 @@ const Information = () => {
                   </div>
                   <div>
                     <div>Công việc đã đăng</div>
-                    <Link to="/1" className="text-dark">
+                    <Link to="/employer/jobs" className="text-dark">
                       Xem chi tiết
                     </Link>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -150,7 +131,7 @@ const Information = () => {
                 onChange={(e) => setLastName(e.target.value)}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicUsername1">
+            {/* <Form.Group className="mb-3" controlId="formBasicUsername1">
               <Form.Label>Username</Form.Label>
               <Form.Control
                 type="text"
@@ -158,7 +139,7 @@ const Information = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
               />
-            </Form.Group>
+            </Form.Group> */}
             <Form.Group className="mb-3" controlId="formBasicEmail1">
               <Form.Label>Email </Form.Label>
               <Form.Control
@@ -168,19 +149,10 @@ const Information = () => {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicPassword1">
-              <Form.Label>Mật khẩu </Form.Label>
-              <Form.Control
-                type="password"
-                placeholder="Nhập mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group className="mb-3" controlId="formBasicAvatar1">
+            {/* <Form.Group className="mb-3" controlId="formBasicAvatar1">
               <Form.Label>Avatar </Form.Label>
               <Form.Control type="file" placeholder="Chọn ảnh" />
-            </Form.Group>
+            </Form.Group> */}
           </Form>
         </Modal.Body>
         <Modal.Footer>
