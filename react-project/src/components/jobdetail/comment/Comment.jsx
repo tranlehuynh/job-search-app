@@ -23,18 +23,19 @@ function Comment() {
   const [id, setId] = useState("");
   const [myRating, setMyRating] = useState(0);
 
+  const loadData = async () => {
+    const response = await Api.get(endpoints["load-comment"], {
+      headers: {
+        Authorization: `Bearer ${cookie.load("token")}`,
+      },
+    });
+    const data = await response.data.filter((e) => e.job.id == jobId);
+    setComment(data);
+  };
+
   useEffect(() => {
-    const loadData = async () => {
-      const response = await Api.get(endpoints["load-comment"], {
-        headers: {
-          Authorization: `Bearer ${cookie.load("token")}`,
-        },
-      });
-      const data = await response.data.filter((e) => e.job.id == jobId);
-      setComment(data);
-    };
     loadData();
-  }, [jobId, state]);
+  }, [jobId, state, content, value]);
 
   let path = (
     <>
@@ -80,9 +81,10 @@ function Comment() {
         },
       }
     );
-    let temp = Math.random() * 99;
-    setState(temp);
+    // let temp = Math.random() * 99;
+    // setState(temp);
     setValue("");
+    // loadData();
   };
 
   const deleteComment = async (id) => {
@@ -117,7 +119,8 @@ function Comment() {
         handleShow();
       }
     });
-    setState(content);
+    setContent("");
+    // loadData();
     handleClose1();
   };
 
