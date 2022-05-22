@@ -28,7 +28,6 @@ export default function App() {
       <Route path="/employer-register/" element={<EmployerRegister />} />
       <Route path="*" element={<ErrorPage />} />
       <Route path="/admin/manage-user/" element={<ManageUser />} />
-
     </Routes>
   )
 }
